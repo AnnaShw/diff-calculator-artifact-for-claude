@@ -12,10 +12,7 @@
       background: #f5f5f3;
       color: #1a1a18;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
+      padding: 2rem;
     }
 
     .card {
@@ -24,96 +21,39 @@
       border: 0.5px solid rgba(0,0,0,0.12);
       padding: 2rem;
       width: 100%;
-      max-width: 580px;
+      max-width: 100%;
     }
 
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
-    }
-
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
     h1 { font-size: 20px; font-weight: 500; color: #1a1a18; }
 
-    .toggle-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: #666;
-      cursor: pointer;
-      user-select: none;
-    }
-
+    .toggle-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; cursor: pointer; user-select: none; }
     .toggle { position: relative; width: 36px; height: 20px; }
     .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute;
-      inset: 0;
-      background: #ddd;
-      border-radius: 20px;
-      transition: background 0.2s;
-      cursor: pointer;
-    }
-    .slider::before {
-      content: '';
-      position: absolute;
-      width: 14px; height: 14px;
-      left: 3px; top: 3px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.2s;
-    }
+    .slider { position: absolute; inset: 0; background: #ddd; border-radius: 20px; transition: background 0.2s; cursor: pointer; }
+    .slider::before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
     .toggle input:checked + .slider { background: #378ADD; }
     .toggle input:checked + .slider::before { transform: translateX(16px); }
 
-    .inputs { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 1.5rem; }
-    .input-group { flex: 1; }
-
+    .inputs { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .input-group { flex: 1; min-width: 140px; }
     label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
 
-    input[type="number"] {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 16px;
-      border: 0.5px solid rgba(0,0,0,0.2);
-      border-radius: 8px;
-      background: #fff;
-      color: #1a1a18;
-      outline: none;
-      transition: border-color 0.15s;
-      -moz-appearance: textfield;
-    }
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input[type="number"] { width: 100%; padding: 10px 12px; font-size: 16px; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px; background: #fff; color: #1a1a18; outline: none; transition: border-color 0.15s; -moz-appearance: textfield; }
+    input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
     input[type="number"]:focus { border-color: rgba(0,0,0,0.4); }
 
-    .add-btn {
-      padding: 10px 16px;
-      font-size: 14px;
-      font-weight: 500;
-      background: #1a1a18;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: opacity 0.15s;
-    }
+    .add-btn { padding: 10px 16px; font-size: 14px; font-weight: 500; background: #1a1a18; color: #fff; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
     .add-btn:hover { opacity: 0.8; }
     .add-btn:disabled { opacity: 0.3; cursor: default; }
-
     .arrow { font-size: 20px; color: #999; padding-bottom: 10px; }
     .results { display: none; }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-
+    .grid-2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
     .metric { background: #f5f5f3; border-radius: 8px; padding: 14px; text-align: center; }
     .metric-label { font-size: 12px; color: #888; margin-bottom: 4px; }
     .metric-value { font-size: 24px; font-weight: 500; color: #1a1a18; }
     .metric-sub { font-size: 11px; color: #aaa; margin-top: 3px; }
-
     .positive { color: #1D9E75; }
     .negative { color: #D85A30; }
 
@@ -129,28 +69,12 @@
 
     .placeholder { text-align: center; padding: 2rem 0; color: #aaa; font-size: 14px; }
 
-    .history-section {
-      display: none;
-      margin-top: 1.75rem;
-      border-top: 0.5px solid rgba(0,0,0,0.1);
-      padding-top: 1.25rem;
-    }
-
+    .history-section { display: none; margin-top: 1.75rem; border-top: 0.5px solid rgba(0,0,0,0.1); padding-top: 1.25rem; }
     .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .history-title { font-size: 14px; font-weight: 500; color: #444; }
     .history-actions { display: flex; gap: 8px; }
 
-    .btn-sm {
-      padding: 5px 12px;
-      font-size: 12px;
-      font-weight: 500;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 0.5px solid rgba(0,0,0,0.2);
-      background: #fff;
-      color: #444;
-      transition: background 0.15s;
-    }
+    .btn-sm { padding: 5px 12px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; border: 0.5px solid rgba(0,0,0,0.2); background: #fff; color: #444; transition: background 0.15s; }
     .btn-sm:hover { background: #f5f5f3; }
     .btn-sm.danger { border-color: rgba(216,90,48,0.3); color: #D85A30; }
     .btn-sm.danger:hover { background: #fff5f2; }
@@ -160,36 +84,19 @@
     .history-empty { text-align: center; padding: 1rem 0; color: #bbb; font-size: 13px; }
     .history-table-wrap { overflow-x: auto; }
 
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th {
-      text-align: left;
-      font-weight: 500;
-      color: #888;
-      padding: 6px 8px;
-      border-bottom: 0.5px solid rgba(0,0,0,0.1);
-      white-space: normal;
-      word-break: break-word;
-    }
-    td {
-      padding: 7px 8px;
-      border-bottom: 0.5px solid rgba(0,0,0,0.06);
-      color: #1a1a18;
-      white-space: normal;
-      word-break: break-word;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto; }
+    th { text-align: left; font-weight: 500; color: #888; padding: 8px 12px; border-bottom: 0.5px solid rgba(0,0,0,0.1); white-space: nowrap; }
+    td { padding: 8px 12px; border-bottom: 0.5px solid rgba(0,0,0,0.06); color: #1a1a18; white-space: normal; word-break: break-word; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #fafaf8; }
     .td-pos { color: #1D9E75; }
     .td-neg { color: #D85A30; }
-    .td-del { color: #bbb; cursor: pointer; text-align: center; font-size: 16px; padding: 4px 8px; white-space: nowrap; word-break: normal; }
+    .td-del { color: #bbb; cursor: pointer; text-align: center; font-size: 16px; padding: 4px 8px; white-space: nowrap; }
     .td-del:hover { color: #D85A30; }
-
     .storage-badge { font-size: 11px; color: #aaa; margin-left: 6px; font-weight: 400; }
 
-    @media (max-width: 420px) {
-      .grid-2 { grid-template-columns: 1fr; }
-      .header { flex-direction: column; align-items: flex-start; gap: 10px; }
-    }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr 1fr; } body { padding: 1rem; } }
+    @media (max-width: 420px) { .grid-2 { grid-template-columns: 1fr; } .header { flex-direction: column; align-items: flex-start; gap: 10px; } }
   </style>
 </head>
 <body>
@@ -205,24 +112,24 @@
       </label>
     </div>
 
-    <div id="label-row" style="display:none; margin-bottom: 10px;">
-      <label for="entry-label" style="font-size:13px; color:#666; margin-bottom:6px; display:block;">Label <span style="color:#bbb; font-weight:400">(optional — metric name, table, etc.)</span></label>
-      <input type="text" id="entry-label" placeholder="e.g. Revenue Q1 vs Q2, users_table.count…" style="width:100%; padding:10px 12px; font-size:14px; border:0.5px solid rgba(0,0,0,0.2); border-radius:8px; background:#fff; color:#1a1a18; outline:none; transition:border-color 0.15s;" onfocus="this.style.borderColor='rgba(0,0,0,0.4)'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'">
+    <div id="label-row" style="display:none; margin-bottom:10px;">
+      <label for="entry-label" style="font-size:13px;color:#666;margin-bottom:6px;display:block;">Label <span style="color:#bbb;font-weight:400">(optional)</span></label>
+      <input type="text" id="entry-label" placeholder="e.g. Revenue Q1 vs Q2, users_table.count…" style="width:100%;padding:10px 12px;font-size:14px;border:0.5px solid rgba(0,0,0,0.2);border-radius:8px;background:#fff;color:#1a1a18;outline:none;" onfocus="this.style.borderColor='rgba(0,0,0,0.4)'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'">
     </div>
 
     <div class="inputs">
       <div class="input-group">
-        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-          <input type="text" id="label-a" value="A" maxlength="20" oninput="updateLabels()" style="font-size:13px; color:#444; font-weight:500; border:none; border-bottom:1px dashed #ccc; background:transparent; outline:none; width:80px; padding:1px 2px;" title="Click to rename">
-          <span style="font-size:11px; color:#bbb;">name</span>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <input type="text" id="label-a" value="A" maxlength="20" oninput="updateLabels()" style="font-size:13px;color:#444;font-weight:500;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;width:120px;padding:1px 2px;" title="Click to rename">
+          <span style="font-size:11px;color:#bbb;">name</span>
         </div>
         <input type="number" id="n1" placeholder="0" oninput="calc()">
       </div>
       <div class="arrow">↔</div>
       <div class="input-group">
-        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-          <input type="text" id="label-b" value="B" maxlength="20" oninput="updateLabels()" style="font-size:13px; color:#444; font-weight:500; border:none; border-bottom:1px dashed #ccc; background:transparent; outline:none; width:80px; padding:1px 2px;" title="Click to rename">
-          <span style="font-size:11px; color:#bbb;">name</span>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <input type="text" id="label-b" value="B" maxlength="20" oninput="updateLabels()" style="font-size:13px;color:#444;font-weight:500;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;width:120px;padding:1px 2px;" title="Click to rename">
+          <span style="font-size:11px;color:#bbb;">name</span>
         </div>
         <input type="number" id="n2" placeholder="0" oninput="calc()">
       </div>
@@ -241,8 +148,6 @@
           <div class="metric-value" id="rel-val">—</div>
           <div class="metric-sub">|<span class="lbl-a">A</span> − <span class="lbl-b">B</span>| / avg × 100</div>
         </div>
-      </div>
-      <div class="grid-2">
         <div class="metric">
           <div class="metric-label" id="label-ab">Change A → B</div>
           <div class="metric-value" id="change-ab">—</div>
@@ -301,6 +206,17 @@
     let tracking = false;
     let lastResult = null;
     const STORAGE_KEY = 'diff-calc-history';
+
+    const store = {
+      async get(key) {
+        try { return localStorage.getItem(key); } catch(e) {}
+        return null;
+      },
+      async set(key, val) {
+        try { localStorage.setItem(key, val); return; } catch(e) {}
+        throw new Error('no storage available');
+      }
+    };
 
     function fmt(n) { return parseFloat(n.toPrecision(6)).toLocaleString(); }
     function fmtPct(n) { return isFinite(n) ? n.toFixed(2) + '%' : '∞'; }
@@ -395,8 +311,8 @@
         <tr>
           <td style="color:#aaa">${i + 1}</td>
           <td style="color:#555;">${r.label || '<span style="color:#ccc">—</span>'}</td>
-          <td title="${r.nameA || 'A'}">${fmt(r.a)}</td>
-          <td title="${r.nameB || 'B'}">${fmt(r.b)}</td>
+          <td>${fmt(r.a)}</td>
+          <td>${fmt(r.b)}</td>
           <td>${fmt(r.abs)}</td>
           <td>${fmtPct(r.rel)}</td>
           <td class="${r.chAB >= 0 ? 'td-pos' : 'td-neg'}">${signPct(r.chAB)}</td>
@@ -426,14 +342,14 @@
       t.style.border = isError ? '0.5px solid rgba(216,90,48,0.3)' : '0.5px solid rgba(55,138,221,0.3)';
       t.style.opacity = '1';
       clearTimeout(t._timer);
-      t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2000);
+      t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
     }
 
     async function saveToStorage() {
       const badge = document.getElementById('storage-badge');
       try {
         badge.textContent = 'saving…';
-        await window.storage.set(STORAGE_KEY, JSON.stringify(entries));
+        await store.set(STORAGE_KEY, JSON.stringify(entries));
         badge.textContent = 'saved ✓';
         setTimeout(() => { badge.textContent = ''; }, 1800);
       } catch(e) {
@@ -446,9 +362,9 @@
       const badge = document.getElementById('storage-badge');
       badge.textContent = 'loading…';
       try {
-        const result = await window.storage.get(STORAGE_KEY);
-        if (result && result.value) {
-          entries = JSON.parse(result.value);
+        const val = await store.get(STORAGE_KEY);
+        if (val) {
+          entries = JSON.parse(val);
           renderHistory();
           badge.textContent = entries.length ? '(' + entries.length + ' saved)' : '';
           setTimeout(() => { badge.textContent = ''; }, 2500);
@@ -499,8 +415,7 @@
     function download(filename, content, type) {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([content], { type }));
-      a.download = filename;
-      document.body.appendChild(a); a.click();
+      a.download = filename; document.body.appendChild(a); a.click();
       document.body.removeChild(a); URL.revokeObjectURL(a.href);
     }
 
