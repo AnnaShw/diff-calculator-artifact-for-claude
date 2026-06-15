@@ -6,26 +6,19 @@
   <title>Difference Calculator</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f5f5f3;
-      color: #1a1a18;
-      min-height: 100vh;
-      padding: 2rem;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 16px;
-      border: 0.5px solid rgba(0,0,0,0.12);
-      padding: 2rem;
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; padding: 2rem; }
+    .card { background: #fff; border-radius: 16px; border: 0.5px solid rgba(0,0,0,0.12); padding: 2rem; width: 100%; }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px; }
     h1 { font-size: 20px; font-weight: 500; color: #1a1a18; }
+    .storage-badge { font-size: 11px; color: #aaa; margin-left: 6px; font-weight: 400; }
+
+    .mode-tabs { display: flex; gap: 6px; margin-bottom: 1.5rem; }
+    .tab-btn { padding: 7px 18px; font-size: 13px; font-weight: 500; border-radius: 8px; border: 0.5px solid rgba(0,0,0,0.18); background: #fff; color: #666; cursor: pointer; transition: all 0.15s; }
+    .tab-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+    .tab-btn:hover:not(.active) { background: #f5f5f3; }
+
+    .mode-panel { display: none; }
+    .mode-panel.active { display: block; }
 
     .toggle-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; cursor: pointer; user-select: none; }
     .toggle { position: relative; width: 36px; height: 20px; }
@@ -38,18 +31,35 @@
     .inputs { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .input-group { flex: 1; min-width: 140px; }
     label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
-
     input[type="number"] { width: 100%; padding: 10px 12px; font-size: 16px; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px; background: #fff; color: #1a1a18; outline: none; transition: border-color 0.15s; -moz-appearance: textfield; }
     input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
     input[type="number"]:focus { border-color: rgba(0,0,0,0.4); }
+
+    .file-mode-inner { display: flex; gap: 6px; margin-bottom: 1rem; }
+    .file-source-btn { flex: 1; padding: 8px 14px; font-size: 13px; font-weight: 500; border-radius: 8px; border: 0.5px solid rgba(0,0,0,0.18); background: #fff; color: #666; cursor: pointer; transition: all 0.15s; text-align: center; }
+    .file-source-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+
+    .file-drop { border: 1.5px dashed rgba(0,0,0,0.15); border-radius: 10px; padding: 1.5rem; text-align: center; color: #aaa; font-size: 13px; cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 10px; }
+    .file-drop:hover, .file-drop.drag { border-color: #378ADD; background: #f0f6ff; color: #185FA5; }
+    .file-drop input[type="file"] { display: none; }
+
+    .select-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; align-items: flex-end; }
+    .select-group { flex: 1; min-width: 140px; }
+    .select-group label { font-size: 12px; color: #888; margin-bottom: 4px; display: block; }
+    select { width: 100%; padding: 8px 10px; font-size: 13px; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px; background: #fff; color: #1a1a18; outline: none; }
+    select:focus { border-color: rgba(0,0,0,0.4); }
+    select[multiple] { height: 90px; }
+
+    .file-names { font-size: 12px; color: #888; margin-top: 6px; }
+    .file-error { color: #D85A30; font-size: 13px; margin-top: 6px; padding: 8px 12px; background: #fff5f2; border-radius: 8px; border: 0.5px solid rgba(216,90,48,0.2); display: none; }
 
     .add-btn { padding: 10px 16px; font-size: 14px; font-weight: 500; background: #1a1a18; color: #fff; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
     .add-btn:hover { opacity: 0.8; }
     .add-btn:disabled { opacity: 0.3; cursor: default; }
     .arrow { font-size: 20px; color: #999; padding-bottom: 10px; }
-    .results { display: none; }
 
-    .grid-2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
+    .results { display: none; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
     .metric { background: #f5f5f3; border-radius: 8px; padding: 14px; text-align: center; }
     .metric-label { font-size: 12px; color: #888; margin-bottom: 4px; }
     .metric-value { font-size: 24px; font-weight: 500; color: #1a1a18; }
@@ -70,9 +80,9 @@
     .placeholder { text-align: center; padding: 2rem 0; color: #aaa; font-size: 14px; }
 
     .history-section { display: none; margin-top: 1.75rem; border-top: 0.5px solid rgba(0,0,0,0.1); padding-top: 1.25rem; }
-    .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
     .history-title { font-size: 14px; font-weight: 500; color: #444; }
-    .history-actions { display: flex; gap: 8px; }
+    .history-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
     .btn-sm { padding: 5px 12px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; border: 0.5px solid rgba(0,0,0,0.2); background: #fff; color: #444; transition: background 0.15s; }
     .btn-sm:hover { background: #f5f5f3; }
@@ -81,10 +91,12 @@
     .btn-sm.export { border-color: rgba(55,138,221,0.3); color: #185FA5; }
     .btn-sm.export:hover { background: #f0f6ff; }
 
+    .filter-group { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; }
+    .filter-group select { padding: 4px 8px; font-size: 12px; width: auto; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 6px; }
+
     .history-empty { text-align: center; padding: 1rem 0; color: #bbb; font-size: 13px; }
     .history-table-wrap { overflow-x: auto; }
-
-    table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { text-align: left; font-weight: 500; color: #888; padding: 8px 12px; border-bottom: 0.5px solid rgba(0,0,0,0.1); white-space: nowrap; }
     td { padding: 8px 12px; border-bottom: 0.5px solid rgba(0,0,0,0.06); color: #1a1a18; white-space: normal; word-break: break-word; }
     tr:last-child td { border-bottom: none; }
@@ -93,16 +105,25 @@
     .td-neg { color: #D85A30; }
     .td-del { color: #bbb; cursor: pointer; text-align: center; font-size: 16px; padding: 4px 8px; white-space: nowrap; }
     .td-del:hover { color: #D85A30; }
-    .storage-badge { font-size: 11px; color: #aaa; margin-left: 6px; font-weight: 400; }
 
-    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr 1fr; } body { padding: 1rem; } }
-    @media (max-width: 420px) { .grid-2 { grid-template-columns: 1fr; } .header { flex-direction: column; align-items: flex-start; gap: 10px; } }
+    @media (max-width: 700px) { .grid-4 { grid-template-columns: 1fr 1fr; } body { padding: 1rem; } }
+    @media (max-width: 420px) { .grid-4 { grid-template-columns: 1fr; } .header { flex-direction: column; align-items: flex-start; } }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="header">
-      <h1>Difference Calculator <span class="storage-badge" id="storage-badge"></span></h1>
+<div class="card">
+  <div class="header">
+    <h1>Difference Calculator <span class="storage-badge" id="storage-badge"></span></h1>
+  </div>
+
+  <div class="mode-tabs">
+    <button class="tab-btn active" onclick="switchMode('manual')">✏️ Manual</button>
+    <button class="tab-btn" onclick="switchMode('file')">📂 From File</button>
+  </div>
+
+  <!-- MANUAL MODE -->
+  <div class="mode-panel active" id="panel-manual">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
       <label class="toggle-wrap">
         Track history
         <span class="toggle">
@@ -112,32 +133,32 @@
       </label>
     </div>
 
-    <div id="label-row" style="display:none; margin-bottom:10px;">
+    <div id="label-row" style="display:none;margin-bottom:10px;">
       <label for="entry-label" style="font-size:13px;color:#666;margin-bottom:6px;display:block;">Label <span style="color:#bbb;font-weight:400">(optional)</span></label>
-      <input type="text" id="entry-label" placeholder="e.g. Revenue Q1 vs Q2, users_table.count…" style="width:100%;padding:10px 12px;font-size:14px;border:0.5px solid rgba(0,0,0,0.2);border-radius:8px;background:#fff;color:#1a1a18;outline:none;" onfocus="this.style.borderColor='rgba(0,0,0,0.4)'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'">
+      <input type="text" id="entry-label" placeholder="e.g. Revenue Q1 vs Q2…" style="width:100%;padding:10px 12px;font-size:14px;border:0.5px solid rgba(0,0,0,0.2);border-radius:8px;background:#fff;color:#1a1a18;outline:none;" onfocus="this.style.borderColor='rgba(0,0,0,0.4)'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'">
     </div>
 
     <div class="inputs">
       <div class="input-group">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-          <input type="text" id="label-a" value="A" maxlength="20" oninput="updateLabels()" style="font-size:13px;color:#444;font-weight:500;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;width:120px;padding:1px 2px;" title="Click to rename">
+          <input type="text" id="label-a" value="A" maxlength="30" oninput="updateLabels()" style="font-size:13px;color:#444;font-weight:500;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;width:140px;padding:1px 2px;">
           <span style="font-size:11px;color:#bbb;">name</span>
         </div>
-        <input type="number" id="n1" placeholder="0" oninput="calc()">
+        <input type="number" id="n1" placeholder="0" oninput="calcManual()">
       </div>
       <div class="arrow">↔</div>
       <div class="input-group">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-          <input type="text" id="label-b" value="B" maxlength="20" oninput="updateLabels()" style="font-size:13px;color:#444;font-weight:500;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;width:120px;padding:1px 2px;" title="Click to rename">
+          <input type="text" id="label-b" value="B" maxlength="30" oninput="updateLabels()" style="font-size:13px;color:#444;font-weight:500;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;width:140px;padding:1px 2px;">
           <span style="font-size:11px;color:#bbb;">name</span>
         </div>
-        <input type="number" id="n2" placeholder="0" oninput="calc()">
+        <input type="number" id="n2" placeholder="0" oninput="calcManual()">
       </div>
-      <button class="add-btn" id="add-btn" onclick="addToHistory()" disabled style="display:none">+ Add</button>
+      <button class="add-btn" id="add-btn" onclick="addManualToHistory()" disabled style="display:none">+ Add</button>
     </div>
 
     <div id="results" class="results">
-      <div class="grid-2">
+      <div class="grid-4">
         <div class="metric">
           <div class="metric-label">Absolute difference</div>
           <div class="metric-value" id="abs-val">—</div>
@@ -171,255 +192,489 @@
         </div>
       </div>
     </div>
-
     <div id="placeholder" class="placeholder">Enter two numbers above to see the difference</div>
+  </div>
 
-    <div class="history-section" id="history-section">
-      <div class="history-header">
-        <span class="history-title">History <span id="history-count" style="color:#aaa;font-weight:400"></span></span>
-        <div class="history-actions">
-          <button class="btn-sm export btn-export" onclick="exportCSV()">↓ CSV</button>
-          <button class="btn-sm export btn-export" onclick="exportJSON()">↓ JSON</button>
-          <button class="btn-sm danger" onclick="clearHistory()">Clear</button>
+  <!-- FILE MODE -->
+  <div class="mode-panel" id="panel-file">
+    <div class="file-mode-inner">
+      <button class="file-source-btn active" id="btn-one-file" onclick="setFileSource('one')">One file</button>
+      <button class="file-source-btn" id="btn-two-files" onclick="setFileSource('two')">Two files</button>
+    </div>
+
+    <div id="one-file-ui">
+      <div class="file-drop" id="drop-one" onclick="document.getElementById('file-one').click()" ondragover="onDragOver(event,'drop-one')" ondragleave="onDragLeave('drop-one')" ondrop="onDrop(event,'one')">
+        <input type="file" id="file-one" accept=".csv,.tsv" onchange="loadFile(this.files[0],'one')">
+        <div>📄 Drag & drop CSV/TSV here or <u>browse</u></div>
+        <div id="fname-one" class="file-names"></div>
+      </div>
+      <div class="select-row" id="one-selects" style="display:none">
+        <div class="select-group">
+          <label>Label columns (multi-select)</label>
+          <select id="sel-label-cols" multiple></select>
+        </div>
+        <div class="select-group">
+          <label>Column A (value 1)</label>
+          <select id="sel-col-a"></select>
+        </div>
+        <div class="select-group">
+          <label>Column B (value 2)</label>
+          <select id="sel-col-b"></select>
         </div>
       </div>
-      <div id="history-empty" class="history-empty">No entries yet — click "+ Add" to save a result</div>
-      <div class="history-table-wrap" id="history-table-wrap" style="display:none">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th><th>Label</th>
-              <th id="th-a">A</th><th id="th-b">B</th>
-              <th>|A−B|</th><th>Relative</th>
-              <th id="th-ab">A→B</th><th id="th-ba">B→A</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="history-body"></tbody>
-        </table>
+    </div>
+
+    <div id="two-files-ui" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;">
+        <div>
+          <div class="file-drop" id="drop-fa" onclick="document.getElementById('file-fa').click()" ondragover="onDragOver(event,'drop-fa')" ondragleave="onDragLeave('drop-fa')" ondrop="onDrop(event,'fa')">
+            <input type="file" id="file-fa" accept=".csv,.tsv" onchange="loadFile(this.files[0],'fa')">
+            <div>📄 File A — drag or <u>browse</u></div>
+            <div id="fname-fa" class="file-names"></div>
+          </div>
+        </div>
+        <div>
+          <div class="file-drop" id="drop-fb" onclick="document.getElementById('file-fb').click()" ondragover="onDragOver(event,'drop-fb')" ondragleave="onDragLeave('drop-fb')" ondrop="onDrop(event,'fb')">
+            <input type="file" id="file-fb" accept=".csv,.tsv" onchange="loadFile(this.files[0],'fb')">
+            <div>📄 File B — drag or <u>browse</u></div>
+            <div id="fname-fb" class="file-names"></div>
+          </div>
+        </div>
       </div>
+      <div class="select-row" id="two-selects" style="display:none">
+        <div class="select-group">
+          <label>Label columns (multi-select)</label>
+          <select id="sel-label-cols2" multiple></select>
+        </div>
+        <div class="select-group">
+          <label>Value column</label>
+          <select id="sel-val-col"></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="file-error" id="file-error"></div>
+    <div style="margin-top:12px;">
+      <button class="add-btn" id="file-calc-btn" onclick="calcFromFile()" disabled>⚡ Calculate</button>
     </div>
   </div>
 
-  <script>
-    let entries = [];
-    let tracking = false;
-    let lastResult = null;
-    const STORAGE_KEY = 'diff-calc-history';
+  <!-- HISTORY -->
+  <div class="history-section" id="history-section">
+    <div class="history-header">
+      <span class="history-title">History <span id="history-count" style="color:#aaa;font-weight:400"></span></span>
+      <div class="history-actions">
+        <div class="filter-group">
+          Show:
+          <select id="top-select" onchange="renderHistory()">
+            <option value="0">All</option>
+            <option value="5">Top 5</option>
+            <option value="10">Top 10</option>
+            <option value="20">Top 20</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          Sort by:
+          <select id="sort-col-select" onchange="renderHistory()">
+            <option value="none">—</option>
+            <option value="abs">|A−B|</option>
+            <option value="rel">Relative</option>
+          </select>
+          <select id="sort-dir-select" onchange="renderHistory()">
+            <option value="desc">↓ desc</option>
+            <option value="asc">↑ asc</option>
+          </select>
+        </div>
+        <button class="btn-sm export btn-export" onclick="exportCSV()">↓ CSV</button>
+        <button class="btn-sm export btn-export" onclick="exportJSON()">↓ JSON</button>
+        <button class="btn-sm danger" onclick="clearHistory()">Clear</button>
+      </div>
+    </div>
+    <div id="history-empty" class="history-empty">No entries yet</div>
+    <div class="history-table-wrap" id="history-table-wrap" style="display:none">
+      <table>
+        <thead><tr id="table-head"></tr></thead>
+        <tbody id="history-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
-    const store = {
-      async get(key) {
-        try { return localStorage.getItem(key); } catch(e) {}
-        return null;
-      },
-      async set(key, val) {
-        try { localStorage.setItem(key, val); return; } catch(e) {}
-        throw new Error('no storage available');
-      }
+<script>
+  let entries = [];
+  let tracking = false;
+  let lastResult = null;
+  let fileSource = 'one';
+  let fileData = { one: null, fa: null, fb: null };
+  let colNameA = 'A', colNameB = 'B';
+  const STORAGE_KEY = 'diff-calc-v3';
+
+  const store = {
+    async get(k) {
+      try { return localStorage.getItem(k); } catch(e) {}
+      return null;
+    },
+    async set(k, v) {
+      try { localStorage.setItem(k, v); return; } catch(e) {}
+      throw new Error('no storage');
+    }
+  };
+
+  function fmt(n) { return parseFloat(n.toPrecision(6)).toLocaleString(); }
+  function fmtPct(n) { return isFinite(n) ? n.toFixed(2) + '%' : '∞'; }
+  function signPct(n) { return (n >= 0 ? '+' : '') + fmtPct(n); }
+  function getA() { return document.getElementById('label-a').value.trim() || 'A'; }
+  function getB() { return document.getElementById('label-b').value.trim() || 'B'; }
+
+  function calcDiff(a, b) {
+    const abs = Math.abs(a - b);
+    const avg = (Math.abs(a) + Math.abs(b)) / 2;
+    const rel = avg === 0 ? Infinity : (abs / avg) * 100;
+    const chAB = a === 0 ? Infinity : ((b - a) / Math.abs(a)) * 100;
+    const chBA = b === 0 ? Infinity : ((a - b) / Math.abs(b)) * 100;
+    return { abs, rel, chAB, chBA };
+  }
+
+  function switchMode(m) {
+    document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + m).classList.add('active');
+    document.querySelectorAll('.tab-btn')[m === 'manual' ? 0 : 1].classList.add('active');
+    document.getElementById('history-section').style.display = entries.length > 0 ? 'block' : (m === 'manual' && tracking ? 'block' : 'none');
+  }
+
+  function updateLabels() {
+    const a = getA(), b = getB();
+    document.querySelectorAll('.lbl-a').forEach(el => el.textContent = a);
+    document.querySelectorAll('.lbl-b').forEach(el => el.textContent = b);
+    document.getElementById('label-ab').textContent = 'Change ' + a + ' → ' + b;
+    document.getElementById('label-ba').textContent = 'Change ' + b + ' → ' + a;
+    if (lastResult) {
+      document.getElementById('leg-a').textContent = a + ': ' + fmt(lastResult.a);
+      document.getElementById('leg-b').textContent = b + ': ' + fmt(lastResult.b);
+    }
+  }
+
+  function calcManual() {
+    const a = parseFloat(document.getElementById('n1').value);
+    const b = parseFloat(document.getElementById('n2').value);
+    const res = document.getElementById('results');
+    const ph = document.getElementById('placeholder');
+    const addBtn = document.getElementById('add-btn');
+    if (isNaN(a) || isNaN(b)) {
+      res.style.display = 'none'; ph.style.display = 'block';
+      addBtn.disabled = true; lastResult = null; return;
+    }
+    res.style.display = 'block'; ph.style.display = 'none';
+    const d = calcDiff(a, b);
+    lastResult = { a, b, ...d, time: new Date().toISOString(), nameA: getA(), nameB: getB() };
+    document.getElementById('abs-val').textContent = fmt(d.abs);
+    document.getElementById('rel-val').textContent = fmtPct(d.rel);
+    const elAB = document.getElementById('change-ab');
+    elAB.textContent = signPct(d.chAB);
+    elAB.className = 'metric-value ' + (d.chAB >= 0 ? 'positive' : 'negative');
+    const elBA = document.getElementById('change-ba');
+    elBA.textContent = signPct(d.chBA);
+    elBA.className = 'metric-value ' + (d.chBA >= 0 ? 'positive' : 'negative');
+    const max = Math.max(Math.abs(a), Math.abs(b));
+    if (max > 0) {
+      document.getElementById('bar-a').style.width = (Math.abs(a) / max * 100) + '%';
+      document.getElementById('bar-b').style.width = (Math.abs(b) / max * 100) + '%';
+    }
+    document.getElementById('leg-a').textContent = getA() + ': ' + fmt(a);
+    document.getElementById('leg-b').textContent = getB() + ': ' + fmt(b);
+    if (tracking) addBtn.disabled = false;
+  }
+
+  function toggleTracking() {
+    tracking = document.getElementById('track-toggle').checked;
+    document.getElementById('history-section').style.display = tracking ? 'block' : 'none';
+    document.getElementById('label-row').style.display = tracking ? 'block' : 'none';
+    const addBtn = document.getElementById('add-btn');
+    addBtn.style.display = tracking ? 'inline-block' : 'none';
+    addBtn.disabled = !tracking || !lastResult;
+  }
+
+  async function addManualToHistory() {
+    if (!lastResult) return;
+    const label = document.getElementById('entry-label').value.trim();
+    colNameA = getA(); colNameB = getB();
+    entries.push({ ...lastResult, label });
+    renderHistory();
+    document.getElementById('add-btn').disabled = true;
+    await saveToStorage();
+  }
+
+  function setFileSource(src) {
+    fileSource = src;
+    document.getElementById('one-file-ui').style.display = src === 'one' ? 'block' : 'none';
+    document.getElementById('two-files-ui').style.display = src === 'two' ? 'block' : 'none';
+    document.getElementById('btn-one-file').classList.toggle('active', src === 'one');
+    document.getElementById('btn-two-files').classList.toggle('active', src === 'two');
+    checkFileCalcReady();
+  }
+
+  function onDragOver(e, id) { e.preventDefault(); document.getElementById(id).classList.add('drag'); }
+  function onDragLeave(id) { document.getElementById(id).classList.remove('drag'); }
+  function onDrop(e, slot) {
+    e.preventDefault();
+    const idMap = { one: 'drop-one', fa: 'drop-fa', fb: 'drop-fb' };
+    document.getElementById(idMap[slot]).classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f) loadFile(f, slot);
+  }
+
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/);
+    const sep = lines[0].includes('\t') ? '\t' : ',';
+    const headers = lines[0].split(sep).map(h => h.trim().replace(/^"|"$/g, ''));
+    const rows = lines.slice(1).map(l => {
+      const vals = l.split(sep).map(v => v.trim().replace(/^"|"$/g, ''));
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = vals[i] ?? '');
+      return obj;
+    }).filter(r => Object.values(r).some(v => v !== ''));
+    return { headers, rows };
+  }
+
+  function loadFile(file, slot) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const parsed = parseCSV(e.target.result);
+      fileData[slot] = parsed;
+      const nameEl = document.getElementById('fname-' + slot);
+      if (nameEl) nameEl.textContent = '✓ ' + file.name + ' (' + parsed.rows.length + ' rows)';
+      if (slot === 'one') populateOneFileSelects(parsed.headers);
+      if (slot === 'fa' || slot === 'fb') checkTwoFiles();
+      checkFileCalcReady();
+      hideFileError();
     };
+    reader.readAsText(file);
+  }
 
-    function fmt(n) { return parseFloat(n.toPrecision(6)).toLocaleString(); }
-    function fmtPct(n) { return isFinite(n) ? n.toFixed(2) + '%' : '∞'; }
-    function signPct(n) { return (n >= 0 ? '+' : '') + fmtPct(n); }
-    function getA() { return document.getElementById('label-a').value.trim() || 'A'; }
-    function getB() { return document.getElementById('label-b').value.trim() || 'B'; }
+  function populateOneFileSelects(headers) {
+    const selLabel = document.getElementById('sel-label-cols');
+    const selA = document.getElementById('sel-col-a');
+    const selB = document.getElementById('sel-col-b');
+    [selLabel, selA, selB].forEach(s => s.innerHTML = '');
+    headers.forEach(h => {
+      selLabel.add(new Option(h, h));
+      selA.add(new Option(h, h));
+      selB.add(new Option(h, h));
+    });
+    if (headers.length > 1) { selA.value = headers[headers.length - 2]; selB.value = headers[headers.length - 1]; }
+    document.getElementById('one-selects').style.display = 'flex';
+  }
 
-    function updateLabels() {
-      const a = getA(), b = getB();
-      document.querySelectorAll('.lbl-a').forEach(el => el.textContent = a);
-      document.querySelectorAll('.lbl-b').forEach(el => el.textContent = b);
-      document.getElementById('label-ab').textContent = 'Change ' + a + ' → ' + b;
-      document.getElementById('label-ba').textContent = 'Change ' + b + ' → ' + a;
-      document.getElementById('leg-a').textContent = a + ': ' + (lastResult ? fmt(lastResult.a) : '—');
-      document.getElementById('leg-b').textContent = b + ': ' + (lastResult ? fmt(lastResult.b) : '—');
-      document.getElementById('th-a').textContent = a;
-      document.getElementById('th-b').textContent = b;
-      document.getElementById('th-ab').textContent = a + '→' + b;
-      document.getElementById('th-ba').textContent = b + '→' + a;
+  function checkTwoFiles() {
+    const fa = fileData.fa, fb = fileData.fb;
+    if (!fa || !fb) return;
+    if (fa.headers.join('|') !== fb.headers.join('|')) {
+      showFileError('Column names do not match: [' + fa.headers.join(', ') + '] vs [' + fb.headers.join(', ') + ']');
+      document.getElementById('two-selects').style.display = 'none';
+      return;
     }
+    hideFileError();
+    const selLabel2 = document.getElementById('sel-label-cols2');
+    const selVal = document.getElementById('sel-val-col');
+    [selLabel2, selVal].forEach(s => s.innerHTML = '');
+    fa.headers.forEach(h => { selLabel2.add(new Option(h, h)); selVal.add(new Option(h, h)); });
+    if (fa.headers.length > 0) selVal.value = fa.headers[fa.headers.length - 1];
+    document.getElementById('two-selects').style.display = 'flex';
+  }
 
-    function calc() {
-      const a = parseFloat(document.getElementById('n1').value);
-      const b = parseFloat(document.getElementById('n2').value);
-      const res = document.getElementById('results');
-      const ph = document.getElementById('placeholder');
-      const addBtn = document.getElementById('add-btn');
-      if (isNaN(a) || isNaN(b)) {
-        res.style.display = 'none'; ph.style.display = 'block';
-        addBtn.disabled = true; lastResult = null; return;
-      }
-      res.style.display = 'block'; ph.style.display = 'none';
-      const abs = Math.abs(a - b);
-      const avg = (Math.abs(a) + Math.abs(b)) / 2;
-      const rel = avg === 0 ? Infinity : (abs / avg) * 100;
-      const chAB = a === 0 ? Infinity : ((b - a) / Math.abs(a)) * 100;
-      const chBA = b === 0 ? Infinity : ((a - b) / Math.abs(b)) * 100;
-      lastResult = { a, b, abs, rel, chAB, chBA, time: new Date().toISOString(), nameA: getA(), nameB: getB() };
-      document.getElementById('abs-val').textContent = fmt(abs);
-      document.getElementById('rel-val').textContent = fmtPct(rel);
-      const elAB = document.getElementById('change-ab');
-      elAB.textContent = signPct(chAB);
-      elAB.className = 'metric-value ' + (chAB >= 0 ? 'positive' : 'negative');
-      const elBA = document.getElementById('change-ba');
-      elBA.textContent = signPct(chBA);
-      elBA.className = 'metric-value ' + (chBA >= 0 ? 'positive' : 'negative');
-      const max = Math.max(Math.abs(a), Math.abs(b));
-      if (max > 0) {
-        document.getElementById('bar-a').style.width = (Math.abs(a) / max * 100) + '%';
-        document.getElementById('bar-b').style.width = (Math.abs(b) / max * 100) + '%';
-      }
-      document.getElementById('leg-a').textContent = getA() + ': ' + fmt(a);
-      document.getElementById('leg-b').textContent = getB() + ': ' + fmt(b);
-      if (tracking) addBtn.disabled = false;
-    }
+  function showFileError(msg) { const el = document.getElementById('file-error'); el.textContent = '⚠️ ' + msg; el.style.display = 'block'; }
+  function hideFileError() { document.getElementById('file-error').style.display = 'none'; }
+  function checkFileCalcReady() {
+    const btn = document.getElementById('file-calc-btn');
+    btn.disabled = fileSource === 'one' ? !fileData.one : (!fileData.fa || !fileData.fb);
+  }
 
-    function toggleTracking() {
-      tracking = document.getElementById('track-toggle').checked;
-      document.getElementById('history-section').style.display = tracking ? 'block' : 'none';
-      document.getElementById('label-row').style.display = tracking ? 'block' : 'none';
-      const addBtn = document.getElementById('add-btn');
-      addBtn.style.display = tracking ? 'inline-block' : 'none';
-      addBtn.disabled = !tracking || !lastResult;
-    }
+  function getSelectedOptions(selId) {
+    return Array.from(document.getElementById(selId).selectedOptions).map(o => o.value);
+  }
 
-    async function addToHistory() {
-      if (!lastResult) return;
-      const label = document.getElementById('entry-label').value.trim();
-      entries.push({ ...lastResult, label });
-      document.getElementById('entry-label').value = '';
-      renderHistory();
-      document.getElementById('add-btn').disabled = true;
-      await saveToStorage();
-    }
-
-    function removeEntry(idx) {
-      entries.splice(idx, 1);
-      renderHistory();
-      saveToStorage();
-    }
-
-    function renderHistory() {
-      const body = document.getElementById('history-body');
-      const empty = document.getElementById('history-empty');
-      const wrap = document.getElementById('history-table-wrap');
-      const count = document.getElementById('history-count');
-      count.textContent = entries.length ? '(' + entries.length + ')' : '';
-      updateExportButtons();
-      if (entries.length === 0) { empty.style.display = 'block'; wrap.style.display = 'none'; return; }
-      empty.style.display = 'none'; wrap.style.display = 'block';
-      body.innerHTML = entries.map((r, i) => `
-        <tr>
-          <td style="color:#aaa">${i + 1}</td>
-          <td style="color:#555;">${r.label || '<span style="color:#ccc">—</span>'}</td>
-          <td>${fmt(r.a)}</td>
-          <td>${fmt(r.b)}</td>
-          <td>${fmt(r.abs)}</td>
-          <td>${fmtPct(r.rel)}</td>
-          <td class="${r.chAB >= 0 ? 'td-pos' : 'td-neg'}">${signPct(r.chAB)}</td>
-          <td class="${r.chBA >= 0 ? 'td-pos' : 'td-neg'}">${signPct(r.chBA)}</td>
-          <td class="td-del" onclick="removeEntry(${i})" title="Remove">×</td>
-        </tr>
-      `).join('');
-    }
-
-    function updateExportButtons() {
-      const disabled = entries.length === 0;
-      document.querySelectorAll('.btn-export').forEach(b => {
-        b.disabled = disabled; b.style.opacity = disabled ? '0.35' : '1'; b.style.cursor = disabled ? 'default' : 'pointer';
+  function calcFromFile() {
+    hideFileError();
+    let rows = [];
+    if (fileSource === 'one') {
+      const data = fileData.one; if (!data) return;
+      const labelCols = getSelectedOptions('sel-label-cols');
+      const colA = document.getElementById('sel-col-a').value;
+      const colB = document.getElementById('sel-col-b').value;
+      if (!colA || !colB) { showFileError('Please select columns A and B'); return; }
+      colNameA = colA; colNameB = colB;
+      data.rows.forEach(row => {
+        const a = parseFloat(row[colA]), b = parseFloat(row[colB]);
+        if (isNaN(a) || isNaN(b)) return;
+        const label = labelCols.length ? labelCols.map(c => row[c]).join('_') : '';
+        const d = calcDiff(a, b);
+        rows.push({ a, b, ...d, label, nameA: colA, nameB: colB, time: new Date().toISOString() });
+      });
+    } else {
+      const fa = fileData.fa, fb = fileData.fb; if (!fa || !fb) return;
+      if (fa.headers.join('|') !== fb.headers.join('|')) { showFileError('Column names do not match'); return; }
+      const labelCols = getSelectedOptions('sel-label-cols2');
+      const valCol = document.getElementById('sel-val-col').value;
+      colNameA = 'File A'; colNameB = 'File B';
+      const keyFn = row => labelCols.length ? labelCols.map(c => row[c]).join('_') : JSON.stringify(row);
+      const mapA = {}, mapB = {};
+      fa.rows.forEach(r => { mapA[keyFn(r)] = parseFloat(r[valCol]); });
+      fb.rows.forEach(r => { mapB[keyFn(r)] = parseFloat(r[valCol]); });
+      const keys = [...new Set([...Object.keys(mapA), ...Object.keys(mapB)])];
+      keys.forEach(k => {
+        const a = mapA[k], b = mapB[k];
+        if (isNaN(a) || isNaN(b)) return;
+        const d = calcDiff(a, b);
+        rows.push({ a, b, ...d, label: k, nameA: 'File A', nameB: 'File B', time: new Date().toISOString() });
       });
     }
+    if (!rows.length) { showFileError('No valid rows found — check selected columns'); return; }
+    entries = [...entries, ...rows];
+    renderHistory();
+    document.getElementById('history-section').style.display = 'block';
+    saveToStorage();
+    showToast('Added ' + rows.length + ' rows', false);
+  }
 
-    function showToast(msg, isError) {
-      let t = document.getElementById('toast');
-      if (!t) {
-        t = document.createElement('div'); t.id = 'toast';
-        t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;pointer-events:none;transition:opacity 0.3s;z-index:999;';
-        document.body.appendChild(t);
-      }
-      t.textContent = msg;
-      t.style.background = isError ? '#fff0ed' : '#f0f6ff';
-      t.style.color = isError ? '#D85A30' : '#185FA5';
-      t.style.border = isError ? '0.5px solid rgba(216,90,48,0.3)' : '0.5px solid rgba(55,138,221,0.3)';
-      t.style.opacity = '1';
-      clearTimeout(t._timer);
-      t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+  function getFilteredEntries() {
+    const topN = parseInt(document.getElementById('top-select').value) || 0;
+    const sortCol = document.getElementById('sort-col-select').value;
+    const sortDir = document.getElementById('sort-dir-select').value;
+    let list = [...entries];
+    if (sortCol !== 'none') {
+      list.sort((x, y) => {
+        const vx = isFinite(x[sortCol]) ? x[sortCol] : (sortDir === 'desc' ? -Infinity : Infinity);
+        const vy = isFinite(y[sortCol]) ? y[sortCol] : (sortDir === 'desc' ? -Infinity : Infinity);
+        return sortDir === 'desc' ? vy - vx : vx - vy;
+      });
     }
+    return topN > 0 ? list.slice(0, topN) : list;
+  }
 
-    async function saveToStorage() {
-      const badge = document.getElementById('storage-badge');
-      try {
-        badge.textContent = 'saving…';
-        await store.set(STORAGE_KEY, JSON.stringify(entries));
-        badge.textContent = 'saved ✓';
-        setTimeout(() => { badge.textContent = ''; }, 1800);
-      } catch(e) {
-        badge.textContent = '';
-        showToast('Could not save to storage', true);
-      }
+  function renderHistory() {
+    const body = document.getElementById('history-body');
+    const head = document.getElementById('table-head');
+    const empty = document.getElementById('history-empty');
+    const wrap = document.getElementById('history-table-wrap');
+    document.getElementById('history-count').textContent = entries.length ? '(' + entries.length + ')' : '';
+    updateExportButtons();
+    if (!entries.length) { empty.style.display = 'block'; wrap.style.display = 'none'; return; }
+    empty.style.display = 'none'; wrap.style.display = 'block';
+    const nA = entries[0]?.nameA || colNameA || 'A';
+    const nB = entries[0]?.nameB || colNameB || 'B';
+    head.innerHTML = `<th>#</th><th>Label</th><th>${nA}</th><th>${nB}</th><th>|A−B|</th><th>Relative %</th><th></th>`;
+    const list = getFilteredEntries();
+    body.innerHTML = list.map(r => {
+      const origIdx = entries.indexOf(r);
+      return `<tr>
+        <td style="color:#aaa">${origIdx + 1}</td>
+        <td style="color:#555;">${r.label || '<span style="color:#ccc">—</span>'}</td>
+        <td>${fmt(r.a)}</td>
+        <td>${fmt(r.b)}</td>
+        <td>${fmt(r.abs)}</td>
+        <td>${fmtPct(r.rel)}</td>
+        <td class="td-del" onclick="removeEntry(${origIdx})" title="Remove">×</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function removeEntry(idx) { entries.splice(idx, 1); renderHistory(); saveToStorage(); }
+
+  function updateExportButtons() {
+    const disabled = !entries.length;
+    document.querySelectorAll('.btn-export').forEach(b => {
+      b.disabled = disabled; b.style.opacity = disabled ? '0.35' : '1'; b.style.cursor = disabled ? 'default' : 'pointer';
+    });
+  }
+
+  function exportCSV() {
+    if (!entries.length) { showToast('No data to export', true); return; }
+    const nA = entries[0]?.nameA || colNameA || 'A';
+    const nB = entries[0]?.nameB || colNameB || 'B';
+    const header = ['Label', nA, nB, `|${nA}-${nB}|`, 'Relative %', 'Timestamp'].join(',');
+    const rows = entries.map(r => [
+      '"' + (r.label || '').replace(/"/g, '""') + '"',
+      r.a, r.b,
+      r.abs.toFixed(6),
+      isFinite(r.rel) ? r.rel.toFixed(4) : 'Infinity',
+      r.time
+    ].join(','));
+    download('diff_history.csv', [header, ...rows].join('\n'), 'text/csv');
+    showToast('CSV saved (' + entries.length + ' rows)', false);
+  }
+
+  function exportJSON() {
+    if (!entries.length) { showToast('No data to export', true); return; }
+    const nA = entries[0]?.nameA || colNameA || 'A';
+    const nB = entries[0]?.nameB || colNameB || 'B';
+    const data = entries.map(r => ({
+      label: r.label || '',
+      [nA]: r.a,
+      [nB]: r.b,
+      abs_diff: r.abs,
+      relative_pct: isFinite(r.rel) ? r.rel : null,
+      timestamp: r.time
+    }));
+    download('diff_history.json', JSON.stringify(data, null, 2), 'application/json');
+    showToast('JSON saved (' + entries.length + ' entries)', false);
+  }
+
+  function download(filename, content, type) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([content], { type }));
+    a.download = filename; document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(a.href);
+  }
+
+  function clearHistory() {
+    if (!entries.length) return;
+    entries = []; renderHistory(); saveToStorage();
+    document.getElementById('history-section').style.display = 'none';
+  }
+
+  async function saveToStorage() {
+    const badge = document.getElementById('storage-badge');
+    try {
+      badge.textContent = 'saving…';
+      await store.set(STORAGE_KEY, JSON.stringify(entries));
+      badge.textContent = 'saved ✓';
+      setTimeout(() => badge.textContent = '', 1800);
+    } catch(e) { badge.textContent = ''; showToast('Could not save', true); }
+  }
+
+  async function loadFromStorage() {
+    const badge = document.getElementById('storage-badge');
+    badge.textContent = 'loading…';
+    try {
+      const val = await store.get(STORAGE_KEY);
+      if (val) {
+        entries = JSON.parse(val);
+        if (entries.length) { renderHistory(); document.getElementById('history-section').style.display = 'block'; }
+        badge.textContent = entries.length ? '(' + entries.length + ' saved)' : '';
+        setTimeout(() => badge.textContent = '', 2500);
+      } else badge.textContent = '';
+    } catch(e) { badge.textContent = ''; }
+  }
+
+  function showToast(msg, isError) {
+    let t = document.getElementById('toast');
+    if (!t) {
+      t = document.createElement('div'); t.id = 'toast';
+      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;pointer-events:none;transition:opacity 0.3s;z-index:999;';
+      document.body.appendChild(t);
     }
+    t.textContent = msg;
+    t.style.background = isError ? '#fff0ed' : '#f0f6ff';
+    t.style.color = isError ? '#D85A30' : '#185FA5';
+    t.style.border = isError ? '0.5px solid rgba(216,90,48,0.3)' : '0.5px solid rgba(55,138,221,0.3)';
+    t.style.opacity = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.style.opacity = '0', 2500);
+  }
 
-    async function loadFromStorage() {
-      const badge = document.getElementById('storage-badge');
-      badge.textContent = 'loading…';
-      try {
-        const val = await store.get(STORAGE_KEY);
-        if (val) {
-          entries = JSON.parse(val);
-          renderHistory();
-          badge.textContent = entries.length ? '(' + entries.length + ' saved)' : '';
-          setTimeout(() => { badge.textContent = ''; }, 2500);
-        } else { badge.textContent = ''; }
-      } catch(e) { badge.textContent = ''; }
-    }
-
-    function clearHistory() {
-      if (entries.length === 0) return;
-      entries = [];
-      renderHistory();
-      saveToStorage();
-    }
-
-    function exportCSV() {
-      if (entries.length === 0) { showToast('Add entries first', true); return; }
-      const header = 'Label,Name A,Value A,Name B,Value B,Absolute Diff,Relative Diff (%),Change A→B (%),Change B→A (%),Timestamp';
-      const rows = entries.map(r => [
-        '"' + (r.label || '').replace(/"/g, '""') + '"',
-        '"' + (r.nameA || 'A').replace(/"/g, '""') + '"', r.a,
-        '"' + (r.nameB || 'B').replace(/"/g, '""') + '"', r.b,
-        r.abs.toFixed(6),
-        isFinite(r.rel) ? r.rel.toFixed(4) : 'Infinity',
-        isFinite(r.chAB) ? r.chAB.toFixed(4) : 'Infinity',
-        isFinite(r.chBA) ? r.chBA.toFixed(4) : 'Infinity',
-        r.time
-      ].join(','));
-      download('diff_history.csv', [header, ...rows].join('\n'), 'text/csv');
-      showToast('CSV saved (' + entries.length + ' rows)', false);
-    }
-
-    function exportJSON() {
-      if (entries.length === 0) { showToast('Add entries first', true); return; }
-      const data = entries.map(r => ({
-        label: r.label || '',
-        name_a: r.nameA || 'A', a: r.a,
-        name_b: r.nameB || 'B', b: r.b,
-        absolute_diff: r.abs,
-        relative_diff_pct: isFinite(r.rel) ? r.rel : null,
-        change_a_to_b_pct: isFinite(r.chAB) ? r.chAB : null,
-        change_b_to_a_pct: isFinite(r.chBA) ? r.chBA : null,
-        timestamp: r.time
-      }));
-      download('diff_history.json', JSON.stringify(data, null, 2), 'application/json');
-      showToast('JSON saved (' + entries.length + ' entries)', false);
-    }
-
-    function download(filename, content, type) {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([content], { type }));
-      a.download = filename; document.body.appendChild(a); a.click();
-      document.body.removeChild(a); URL.revokeObjectURL(a.href);
-    }
-
-    loadFromStorage();
-  </script>
+  loadFromStorage();
+</script>
 </body>
 </html>
