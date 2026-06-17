@@ -8,673 +8,620 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; padding: 2rem; }
     .card { background: #fff; border-radius: 16px; border: 0.5px solid rgba(0,0,0,0.12); padding: 2rem; width: 100%; }
-    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px; }
-    h1 { font-size: 20px; font-weight: 500; color: #1a1a18; }
+    h1 { font-size: 20px; font-weight: 500; margin-bottom: 1.5rem; }
     .storage-badge { font-size: 11px; color: #aaa; margin-left: 6px; font-weight: 400; }
-
-    .mode-tabs { display: flex; gap: 6px; margin-bottom: 1.5rem; }
-    .tab-btn { padding: 7px 18px; font-size: 13px; font-weight: 500; border-radius: 8px; border: 0.5px solid rgba(0,0,0,0.18); background: #fff; color: #666; cursor: pointer; transition: all 0.15s; }
-    .tab-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
-    .tab-btn:hover:not(.active) { background: #f5f5f3; }
-
-    .mode-panel { display: none; }
-    .mode-panel.active { display: block; }
-
-    .toggle-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; cursor: pointer; user-select: none; }
-    .toggle { position: relative; width: 36px; height: 20px; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; inset: 0; background: #ddd; border-radius: 20px; transition: background 0.2s; cursor: pointer; }
-    .slider::before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
-    .toggle input:checked + .slider { background: #378ADD; }
-    .toggle input:checked + .slider::before { transform: translateX(16px); }
-
-    .inputs { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; }
-    .input-group { flex: 1; min-width: 140px; }
-    label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
-    input[type="number"] { width: 100%; padding: 10px 12px; font-size: 16px; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px; background: #fff; color: #1a1a18; outline: none; transition: border-color 0.15s; -moz-appearance: textfield; }
-    input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    input[type="number"]:focus { border-color: rgba(0,0,0,0.4); }
-
-    .file-mode-inner { display: flex; gap: 6px; margin-bottom: 1rem; }
-    .file-source-btn { flex: 1; padding: 8px 14px; font-size: 13px; font-weight: 500; border-radius: 8px; border: 0.5px solid rgba(0,0,0,0.18); background: #fff; color: #666; cursor: pointer; transition: all 0.15s; text-align: center; }
-    .file-source-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
-
-    .file-drop { border: 1.5px dashed rgba(0,0,0,0.15); border-radius: 10px; padding: 1.5rem; text-align: center; color: #aaa; font-size: 13px; cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 10px; }
-    .file-drop:hover, .file-drop.drag { border-color: #378ADD; background: #f0f6ff; color: #185FA5; }
-    .file-drop input[type="file"] { display: none; }
-
-    .select-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; align-items: flex-end; }
-    .select-group { flex: 1; min-width: 140px; }
-    .select-group label { font-size: 12px; color: #888; margin-bottom: 4px; display: block; }
-    select { width: 100%; padding: 8px 10px; font-size: 13px; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px; background: #fff; color: #1a1a18; outline: none; }
-    select:focus { border-color: rgba(0,0,0,0.4); }
-    select[multiple] { height: 90px; }
-
-    .file-names { font-size: 12px; color: #888; margin-top: 6px; }
-    .file-error { color: #D85A30; font-size: 13px; margin-top: 6px; padding: 8px 12px; background: #fff5f2; border-radius: 8px; border: 0.5px solid rgba(216,90,48,0.2); display: none; }
-
-    .add-btn { padding: 10px 16px; font-size: 14px; font-weight: 500; background: #1a1a18; color: #fff; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
-    .add-btn:hover { opacity: 0.8; }
-    .add-btn:disabled { opacity: 0.3; cursor: default; }
+    .tabs { display: flex; gap: 6px; margin-bottom: 1.5rem; }
+    .tab { padding: 7px 18px; font-size: 13px; font-weight: 500; border-radius: 8px; border: 0.5px solid rgba(0,0,0,0.18); background: #fff; color: #666; cursor: pointer; }
+    .tab.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+    .tab:hover:not(.active) { background: #f5f5f3; }
+    .panel { display: none; } .panel.active { display: block; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:640px){ .grid2 { grid-template-columns: 1fr; } }
+    .drop { border: 1.5px dashed rgba(0,0,0,0.15); border-radius: 10px; padding: 1.2rem; text-align: center; color: #aaa; font-size: 13px; cursor: pointer; transition: .2s; margin-bottom: 10px; }
+    .drop:hover,.drop.drag { border-color: #378ADD; background: #f0f6ff; color: #185FA5; }
+    .drop input { display: none; }
+    .fname { font-size: 12px; color: #1D9E75; margin-top: 5px; }
+    .sec { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: .06em; margin: 14px 0 8px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
+    .fg { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 130px; }
+    .fg label { font-size: 12px; color: #888; }
+    select, input[type=text] { width: 100%; padding: 7px 10px; font-size: 13px; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px; background: #fff; color: #1a1a18; outline: none; }
+    select:focus, input[type=text]:focus { border-color: rgba(0,0,0,0.45); }
+    select[multiple] { height: 80px; }
+    .toggle-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; margin-bottom: 8px; cursor: pointer; user-select: none; }
+    .tog { position: relative; width: 34px; height: 18px; flex-shrink: 0; }
+    .tog input { opacity: 0; width: 0; height: 0; }
+    .tslider { position: absolute; inset: 0; background: #ddd; border-radius: 20px; transition: .2s; cursor: pointer; }
+    .tslider::before { content:''; position: absolute; width: 12px; height: 12px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+    .tog input:checked + .tslider { background: #378ADD; }
+    .tog input:checked + .tslider::before { transform: translateX(16px); }
+    .err { display: none; color: #D85A30; font-size: 13px; padding: 8px 12px; background: #fff5f2; border-radius: 8px; border: 0.5px solid rgba(216,90,48,0.2); margin-top: 8px; }
+    .btn { padding: 9px 18px; font-size: 13px; font-weight: 500; background: #1a1a18; color: #fff; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: opacity .15s; }
+    .btn:hover { opacity: .8; } .btn:disabled { opacity: .3; cursor: default; }
+    .btn.danger { background: #fff; color: #D85A30; border: 0.5px solid rgba(216,90,48,0.3); }
+    .btn.danger:hover { background: #fff5f2; }
+    .btn.blue { background: #fff; color: #185FA5; border: 0.5px solid rgba(55,138,221,0.3); }
+    .btn.blue:hover { background: #f0f6ff; }
+    .minputs { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 1.2rem; }
+    .mg { flex: 1; min-width: 140px; }
+    .mname-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+    .mname { font-size: 13px; color: #444; font-weight: 500; border: none; border-bottom: 1px dashed #ccc; background: transparent; outline: none; width: 130px; padding: 1px 2px; }
+    .hint { font-size: 11px; color: #bbb; }
+    input[type=number] { width: 100%; padding: 10px 12px; font-size: 16px; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 8px; background: #fff; color: #1a1a18; outline: none; -moz-appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input[type=number]:focus { border-color: rgba(0,0,0,0.4); }
     .arrow { font-size: 20px; color: #999; padding-bottom: 10px; }
-
-    .results { display: none; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 10px; }
+    @media(max-width:640px){ .metrics-grid { grid-template-columns: 1fr 1fr; } }
     .metric { background: #f5f5f3; border-radius: 8px; padding: 14px; text-align: center; }
     .metric-label { font-size: 12px; color: #888; margin-bottom: 4px; }
-    .metric-value { font-size: 24px; font-weight: 500; color: #1a1a18; }
+    .metric-value { font-size: 22px; font-weight: 500; }
     .metric-sub { font-size: 11px; color: #aaa; margin-top: 3px; }
-    .positive { color: #1D9E75; }
-    .negative { color: #D85A30; }
-
-    .bar-section { margin-top: 1.25rem; }
-    .bar-label { font-size: 12px; color: #888; margin-bottom: 6px; }
-    .bar-track { position: relative; height: 32px; background: #f0f0ee; border-radius: 8px; overflow: hidden; }
-    .bar-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 8px; transition: width 0.3s; }
-    .bar-a { background: #378ADD; opacity: 0.7; }
-    .bar-b { background: #1D9E75; opacity: 0.7; }
-    .bar-legend { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; }
-    .leg-a { color: #185FA5; }
-    .leg-b { color: #0F6E56; }
-
-    .placeholder { text-align: center; padding: 2rem 0; color: #aaa; font-size: 14px; }
-
-    .history-section { display: none; margin-top: 1.75rem; border-top: 0.5px solid rgba(0,0,0,0.1); padding-top: 1.25rem; }
-    .history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
-    .history-title { font-size: 14px; font-weight: 500; color: #444; }
-    .history-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-
-    .btn-sm { padding: 5px 12px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; border: 0.5px solid rgba(0,0,0,0.2); background: #fff; color: #444; transition: background 0.15s; }
-    .btn-sm:hover { background: #f5f5f3; }
-    .btn-sm.danger { border-color: rgba(216,90,48,0.3); color: #D85A30; }
-    .btn-sm.danger:hover { background: #fff5f2; }
-    .btn-sm.export { border-color: rgba(55,138,221,0.3); color: #185FA5; }
-    .btn-sm.export:hover { background: #f0f6ff; }
-
-    .filter-group { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; }
-    .filter-group select { padding: 4px 8px; font-size: 12px; width: auto; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 6px; }
-
-    .history-empty { text-align: center; padding: 1rem 0; color: #bbb; font-size: 13px; }
-    .history-table-wrap { overflow-x: auto; }
+    .pos { color: #1D9E75; } .neg { color: #D85A30; }
+    .bar-wrap { margin-top: 1.2rem; }
+    .bar-lbl { font-size: 12px; color: #888; margin-bottom: 6px; }
+    .bar-track { position: relative; height: 30px; background: #f0f0ee; border-radius: 8px; overflow: hidden; }
+    .bar-fill { position: absolute; top:0; left:0; height:100%; border-radius: 8px; transition: width .3s; }
+    .bf-a { background: #378ADD; opacity: .7; } .bf-b { background: #1D9E75; opacity: .7; }
+    .bar-leg { display: flex; justify-content: space-between; margin-top: 5px; font-size: 12px; }
+    .la { color: #185FA5; } .lb { color: #0F6E56; }
+    .ph { text-align: center; padding: 2rem 0; color: #aaa; font-size: 14px; }
+    .track-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; margin-bottom: 1rem; cursor: pointer; user-select: none; }
+    .hist { display: none; margin-top: 1.75rem; border-top: 0.5px solid rgba(0,0,0,0.1); padding-top: 1.25rem; }
+    .hist-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+    .hist-title { font-size: 14px; font-weight: 500; color: #444; }
+    .hist-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .fgroup { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #666; }
+    .fgroup select { padding: 4px 7px; font-size: 12px; width: auto; border: 0.5px solid rgba(0,0,0,0.2); border-radius: 6px; }
+    .hist-empty { text-align: center; padding: 1rem 0; color: #bbb; font-size: 13px; }
+    .tbl-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { text-align: left; font-weight: 500; color: #888; padding: 8px 12px; border-bottom: 0.5px solid rgba(0,0,0,0.1); white-space: nowrap; }
     td { padding: 8px 12px; border-bottom: 0.5px solid rgba(0,0,0,0.06); color: #1a1a18; white-space: normal; word-break: break-word; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #fafaf8; }
-    .td-pos { color: #1D9E75; }
-    .td-neg { color: #D85A30; }
-    .td-del { color: #bbb; cursor: pointer; text-align: center; font-size: 16px; padding: 4px 8px; white-space: nowrap; }
-    .td-del:hover { color: #D85A30; }
-
-    @media (max-width: 700px) { .grid-4 { grid-template-columns: 1fr 1fr; } body { padding: 1rem; } }
-    @media (max-width: 420px) { .grid-4 { grid-template-columns: 1fr; } .header { flex-direction: column; align-items: flex-start; } }
+    .tdpos { color: #1D9E75; } .tdneg { color: #D85A30; }
+    .tddel { color: #bbb; cursor: pointer; text-align: center; font-size: 16px; padding: 4px 8px; white-space: nowrap; }
+    .tddel:hover { color: #D85A30; }
   </style>
 </head>
 <body>
 <div class="card">
-  <div class="header">
-    <h1>Difference Calculator <span class="storage-badge" id="storage-badge"></span></h1>
+  <h1>Difference Calculator <span class="storage-badge" id="sbadge"></span></h1>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('manual')">✏️ Manual</button>
+    <button class="tab" onclick="switchTab('file')">📂 From Files</button>
   </div>
 
-  <div class="mode-tabs">
-    <button class="tab-btn active" onclick="switchMode('manual')">✏️ Manual</button>
-    <button class="tab-btn" onclick="switchMode('file')">📂 From File</button>
-  </div>
-
-  <!-- MANUAL MODE -->
-  <div class="mode-panel active" id="panel-manual">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
-      <label class="toggle-wrap">
-        Track history
-        <span class="toggle">
-          <input type="checkbox" id="track-toggle" onchange="toggleTracking()">
-          <span class="slider"></span>
-        </span>
-      </label>
+  <!-- MANUAL -->
+  <div class="panel active" id="panel-manual">
+    <label class="track-row">
+      Track history
+      <span class="tog"><input type="checkbox" id="track-tog" onchange="onTrack()"><span class="tslider"></span></span>
+    </label>
+    <div id="m-label-row" style="display:none;margin-bottom:10px;">
+      <div class="fg"><label>Label (optional — not cleared after add)</label>
+        <input type="text" id="m-label" placeholder="e.g. Revenue Q1 vs Q2">
+      </div>
     </div>
-
-    <div id="label-row" style="display:none;margin-bottom:10px;">
-      <label for="entry-label" style="font-size:13px;color:#666;margin-bottom:6px;display:block;">Label <span style="color:#bbb;font-weight:400">(optional)</span></label>
-      <input type="text" id="entry-label" placeholder="e.g. Revenue Q1 vs Q2…" style="width:100%;padding:10px 12px;font-size:14px;border:0.5px solid rgba(0,0,0,0.2);border-radius:8px;background:#fff;color:#1a1a18;outline:none;" onfocus="this.style.borderColor='rgba(0,0,0,0.4)'" onblur="this.style.borderColor='rgba(0,0,0,0.2)'">
-    </div>
-
-    <div class="inputs">
-      <div class="input-group">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-          <input type="text" id="label-a" value="A" maxlength="30" oninput="updateLabels()" style="font-size:13px;color:#444;font-weight:500;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;width:140px;padding:1px 2px;">
-          <span style="font-size:11px;color:#bbb;">name</span>
-        </div>
-        <input type="number" id="n1" placeholder="0" oninput="calcManual()">
+    <div class="minputs">
+      <div class="mg">
+        <div class="mname-row"><input class="mname" id="m-na" value="A" maxlength="30" oninput="updManLabels()"><span class="hint">name</span></div>
+        <input type="number" id="m-n1" placeholder="0" oninput="calcManual()">
       </div>
       <div class="arrow">↔</div>
-      <div class="input-group">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-          <input type="text" id="label-b" value="B" maxlength="30" oninput="updateLabels()" style="font-size:13px;color:#444;font-weight:500;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;width:140px;padding:1px 2px;">
-          <span style="font-size:11px;color:#bbb;">name</span>
-        </div>
-        <input type="number" id="n2" placeholder="0" oninput="calcManual()">
+      <div class="mg">
+        <div class="mname-row"><input class="mname" id="m-nb" value="B" maxlength="30" oninput="updManLabels()"><span class="hint">name</span></div>
+        <input type="number" id="m-n2" placeholder="0" oninput="calcManual()">
       </div>
-      <button class="add-btn" id="add-btn" onclick="addManualToHistory()" disabled style="display:none">+ Add</button>
+      <button class="btn" id="m-add-btn" onclick="addManual()" disabled style="display:none">+ Add</button>
     </div>
-
-    <div id="results" class="results">
-      <div class="grid-4">
-        <div class="metric">
-          <div class="metric-label">Absolute difference</div>
-          <div class="metric-value" id="abs-val">—</div>
-          <div class="metric-sub">|<span class="lbl-a">A</span> − <span class="lbl-b">B</span>|</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Relative difference</div>
-          <div class="metric-value" id="rel-val">—</div>
-          <div class="metric-sub">|<span class="lbl-a">A</span> − <span class="lbl-b">B</span>| / avg × 100</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label" id="label-ab">Change A → B</div>
-          <div class="metric-value" id="change-ab">—</div>
-          <div class="metric-sub">(<span class="lbl-b">B</span> − <span class="lbl-a">A</span>) / |<span class="lbl-a">A</span>| × 100</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label" id="label-ba">Change B → A</div>
-          <div class="metric-value" id="change-ba">—</div>
-          <div class="metric-sub">(<span class="lbl-a">A</span> − <span class="lbl-b">B</span>) / |<span class="lbl-b">B</span>| × 100</div>
-        </div>
+    <div id="m-results" style="display:none">
+      <div class="metrics-grid">
+        <div class="metric"><div class="metric-label">Absolute diff</div><div class="metric-value" id="m-abs">—</div><div class="metric-sub">|<span class="mla">A</span>−<span class="mlb">B</span>|</div></div>
+        <div class="metric"><div class="metric-label">Relative diff</div><div class="metric-value" id="m-rel">—</div><div class="metric-sub">/ avg × 100</div></div>
+        <div class="metric"><div class="metric-label" id="m-lab-ab">A→B</div><div class="metric-value" id="m-chab">—</div><div class="metric-sub">(<span class="mlb">B</span>−<span class="mla">A</span>)/|<span class="mla">A</span>|×100</div></div>
+        <div class="metric"><div class="metric-label" id="m-lab-ba">B→A</div><div class="metric-value" id="m-chba">—</div><div class="metric-sub">(<span class="mla">A</span>−<span class="mlb">B</span>)/|<span class="mlb">B</span>|×100</div></div>
       </div>
-      <div class="bar-section">
-        <div class="bar-label">Scale</div>
-        <div class="bar-track">
-          <div class="bar-fill bar-a" id="bar-a"></div>
-          <div class="bar-fill bar-b" id="bar-b"></div>
-        </div>
-        <div class="bar-legend">
-          <span class="leg-a" id="leg-a">A: —</span>
-          <span class="leg-b" id="leg-b">B: —</span>
-        </div>
+      <div class="bar-wrap">
+        <div class="bar-lbl">Scale</div>
+        <div class="bar-track"><div class="bar-fill bf-a" id="m-ba"></div><div class="bar-fill bf-b" id="m-bb"></div></div>
+        <div class="bar-leg"><span class="la" id="m-la">A: —</span><span class="lb" id="m-lb">B: —</span></div>
       </div>
     </div>
-    <div id="placeholder" class="placeholder">Enter two numbers above to see the difference</div>
+    <div class="ph" id="m-ph">Enter two numbers above to see the difference</div>
   </div>
 
   <!-- FILE MODE -->
-  <div class="mode-panel" id="panel-file">
-    <div class="file-mode-inner">
-      <button class="file-source-btn active" id="btn-one-file" onclick="setFileSource('one')">One file</button>
-      <button class="file-source-btn" id="btn-two-files" onclick="setFileSource('two')">Two files</button>
-    </div>
-
-    <div id="one-file-ui">
-      <div class="file-drop" id="drop-one" onclick="document.getElementById('file-one').click()" ondragover="onDragOver(event,'drop-one')" ondragleave="onDragLeave('drop-one')" ondrop="onDrop(event,'one')">
-        <input type="file" id="file-one" accept=".csv,.tsv" onchange="loadFile(this.files[0],'one')">
-        <div>📄 Drag & drop CSV/TSV here or <u>browse</u></div>
-        <div id="fname-one" class="file-names"></div>
-      </div>
-      <div class="select-row" id="one-selects" style="display:none">
-        <div class="select-group">
-          <label>Label columns (multi-select)</label>
-          <select id="sel-label-cols" multiple></select>
+  <div class="panel" id="panel-file">
+    <div class="grid2">
+      <div>
+        <div class="sec">File A</div>
+        <div class="drop" id="drop-a" onclick="document.getElementById('finp-a').click()" ondragover="dov(event,'drop-a')" ondragleave="dlv('drop-a')" ondrop="ddrop(event,'a')">
+          <input type="file" id="finp-a" accept=".csv,.tsv" onchange="loadFile(this.files[0],'a')">
+          📄 Drag CSV/TSV or <u>browse</u>
+          <div class="fname" id="fn-a"></div>
         </div>
-        <div class="select-group">
-          <label>Column A (value 1)</label>
-          <select id="sel-col-a"></select>
-        </div>
-        <div class="select-group">
-          <label>Column B (value 2)</label>
-          <select id="sel-col-b"></select>
-        </div>
-      </div>
-    </div>
-
-    <div id="two-files-ui" style="display:none">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;">
-        <div>
-          <div class="file-drop" id="drop-fa" onclick="document.getElementById('file-fa').click()" ondragover="onDragOver(event,'drop-fa')" ondragleave="onDragLeave('drop-fa')" ondrop="onDrop(event,'fa')">
-            <input type="file" id="file-fa" accept=".csv,.tsv" onchange="loadFile(this.files[0],'fa')">
-            <div>📄 File A — drag or <u>browse</u></div>
-            <div id="fname-fa" class="file-names"></div>
+        <div id="filt-a-wrap" style="display:none">
+          <div class="sec" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Filters A <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#bbb;font-size:11px;">(AND between rows)</span></span>
+            <button class="btn blue" onclick="addFilter('a')" style="padding:3px 10px;font-size:11px;">+ Add filter</button>
           </div>
-        </div>
-        <div>
-          <div class="file-drop" id="drop-fb" onclick="document.getElementById('file-fb').click()" ondragover="onDragOver(event,'drop-fb')" ondragleave="onDragLeave('drop-fb')" ondrop="onDrop(event,'fb')">
-            <input type="file" id="file-fb" accept=".csv,.tsv" onchange="loadFile(this.files[0],'fb')">
-            <div>📄 File B — drag or <u>browse</u></div>
-            <div id="fname-fb" class="file-names"></div>
-          </div>
+          <div id="filters-a-list"></div>
         </div>
       </div>
-      <div class="select-row" id="two-selects" style="display:none">
-        <div class="select-group">
-          <label>Label columns (multi-select)</label>
-          <select id="sel-label-cols2" multiple></select>
+      <div>
+        <div class="sec">File B</div>
+        <div class="drop" id="drop-b" onclick="document.getElementById('finp-b').click()" ondragover="dov(event,'drop-b')" ondragleave="dlv('drop-b')" ondrop="ddrop(event,'b')">
+          <input type="file" id="finp-b" accept=".csv,.tsv" onchange="loadFile(this.files[0],'b')">
+          📄 Drag CSV/TSV or <u>browse</u>
+          <div class="fname" id="fn-b"></div>
         </div>
-        <div class="select-group">
-          <label>Value column</label>
-          <select id="sel-val-col"></select>
+        <div id="filt-b-wrap" style="display:none">
+          <div class="sec" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Filters B <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#bbb;font-size:11px;">(AND between rows)</span></span>
+            <button class="btn blue" onclick="addFilter('b')" style="padding:3px 10px;font-size:11px;">+ Add filter</button>
+          </div>
+          <div id="filters-b-list"></div>
         </div>
       </div>
     </div>
 
-    <div class="file-error" id="file-error"></div>
-    <div style="margin-top:12px;">
-      <button class="add-btn" id="file-calc-btn" onclick="calcFromFile()" disabled>⚡ Calculate</button>
+    <div id="cfg-wrap" style="display:none">
+      <div class="sec">Join & Segment</div>
+      <div class="row">
+        <div class="fg"><label>Segment columns — must exist in both files (select multiple to concatenate with _)</label><select id="seg-col" multiple style="height:90px"></select></div>
+      </div>
+      <div class="sec">Metrics</div>
+      <label class="toggle-row">
+        <span class="tog"><input type="checkbox" id="same-metric-tog" onchange="onSameMetric()" checked><span class="tslider"></span></span>
+        Same metric column in both files
+      </label>
+      <div id="same-metric-ui">
+        <div class="row"><div class="fg"><label>Metric column (both files)</label><select id="metric-both"></select></div></div>
+      </div>
+      <div id="diff-metric-ui" style="display:none">
+        <div class="row">
+          <div class="fg"><label>Metric column — File A</label><select id="metric-a"></select></div>
+          <div class="fg"><label>Metric column — File B</label><select id="metric-b"></select></div>
+        </div>
+      </div>
+      <div class="sec">Column Display Names</div>
+      <div class="row">
+        <div class="fg"><label>Name for File A value</label><input type="text" id="disp-a" placeholder="File A"></div>
+        <div class="fg"><label>Name for File B value</label><input type="text" id="disp-b" placeholder="File B"></div>
+      </div>
+      <div class="sec" style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
+        <span>Metric Overrides <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#bbb;font-size:11px;">— per-segment metric exceptions</span></span>
+        <button class="btn blue" onclick="addOverride()" style="padding:3px 10px;font-size:11px;">+ Add</button>
+      </div>
+      <div id="overrides-list" style="margin-bottom:8px;"></div>
+      <div class="err" id="f-err"></div>
+      <div style="margin-top:14px;"><button class="btn" onclick="calcFiles()">⚡ Calculate</button></div>
     </div>
   </div>
 
   <!-- HISTORY -->
-  <div class="history-section" id="history-section">
-    <div class="history-header">
-      <span class="history-title">History <span id="history-count" style="color:#aaa;font-weight:400"></span></span>
-      <div class="history-actions">
-        <div class="filter-group">
-          Show:
-          <select id="top-select" onchange="renderHistory()">
-            <option value="0">All</option>
-            <option value="5">Top 5</option>
-            <option value="10">Top 10</option>
-            <option value="20">Top 20</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          Sort by:
-          <select id="sort-col-select" onchange="renderHistory()">
-            <option value="none">—</option>
-            <option value="abs">|A−B|</option>
-            <option value="rel">Relative</option>
-          </select>
-          <select id="sort-dir-select" onchange="renderHistory()">
-            <option value="desc">↓ desc</option>
-            <option value="asc">↑ asc</option>
-          </select>
-        </div>
-        <button class="btn-sm export btn-export" onclick="exportCSV()">↓ CSV</button>
-        <button class="btn-sm export btn-export" onclick="exportJSON()">↓ JSON</button>
-        <button class="btn-sm danger" onclick="clearHistory()">Clear</button>
+  <div class="hist" id="hist">
+    <div class="hist-head">
+      <span class="hist-title">Results <span id="h-count" style="color:#aaa;font-weight:400"></span></span>
+      <div class="hist-actions">
+        <div class="fgroup">Show: <select id="top-sel" onchange="renderHist()"><option value="0">All</option><option value="5">Top 5</option><option value="10">Top 10</option><option value="20">Top 20</option></select></div>
+        <div class="fgroup">Sort: <select id="sort-col" onchange="renderHist()"><option value="none">—</option><option value="abs">|A−B|</option><option value="rel">Relative %</option></select><select id="sort-dir" onchange="renderHist()"><option value="desc">↓</option><option value="asc">↑</option></select></div>
+        <button class="btn blue btn-exp" onclick="expCSV()" style="padding:5px 12px;font-size:12px;">↓ CSV</button>
+        <button class="btn blue btn-exp" onclick="expJSON()" style="padding:5px 12px;font-size:12px;">↓ JSON</button>
+        <button class="btn danger" onclick="clearHist()" style="padding:5px 12px;font-size:12px;">Clear</button>
       </div>
     </div>
-    <div id="history-empty" class="history-empty">No entries yet</div>
-    <div class="history-table-wrap" id="history-table-wrap" style="display:none">
-      <table>
-        <thead><tr id="table-head"></tr></thead>
-        <tbody id="history-body"></tbody>
-      </table>
+    <div class="hist-empty" id="h-empty">No entries yet</div>
+    <div class="tbl-wrap" id="h-tbl-wrap" style="display:none">
+      <table><thead><tr id="h-head"></tr></thead><tbody id="h-body"></tbody></table>
     </div>
   </div>
 </div>
 
 <script>
-  let entries = [];
-  let tracking = false;
-  let lastResult = null;
-  let fileSource = 'one';
-  let fileData = { one: null, fa: null, fb: null };
-  let colNameA = 'A', colNameB = 'B';
-  const STORAGE_KEY = 'diff-calc-v3';
+const SKEY='diff-v4';
+let entries=[],lastManual=null,tracking=false;
+let fd={a:null,b:null};
 
-  const store = {
-    async get(k) {
-      try { return localStorage.getItem(k); } catch(e) {}
-      return null;
-    },
-    async set(k, v) {
-      try { localStorage.setItem(k, v); return; } catch(e) {}
-      throw new Error('no storage');
-    }
-  };
-
-  function fmt(n) { return parseFloat(n.toPrecision(6)).toLocaleString(); }
-  function fmtPct(n) { return isFinite(n) ? n.toFixed(2) + '%' : '∞'; }
-  function signPct(n) { return (n >= 0 ? '+' : '') + fmtPct(n); }
-  function getA() { return document.getElementById('label-a').value.trim() || 'A'; }
-  function getB() { return document.getElementById('label-b').value.trim() || 'B'; }
-
-  function calcDiff(a, b) {
-    const abs = Math.abs(a - b);
-    const avg = (Math.abs(a) + Math.abs(b)) / 2;
-    const rel = avg === 0 ? Infinity : (abs / avg) * 100;
-    const chAB = a === 0 ? Infinity : ((b - a) / Math.abs(a)) * 100;
-    const chBA = b === 0 ? Infinity : ((a - b) / Math.abs(b)) * 100;
-    return { abs, rel, chAB, chBA };
-  }
-
-  function switchMode(m) {
-    document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('panel-' + m).classList.add('active');
-    document.querySelectorAll('.tab-btn')[m === 'manual' ? 0 : 1].classList.add('active');
-    document.getElementById('history-section').style.display = entries.length > 0 ? 'block' : (m === 'manual' && tracking ? 'block' : 'none');
-  }
-
-  function updateLabels() {
-    const a = getA(), b = getB();
-    document.querySelectorAll('.lbl-a').forEach(el => el.textContent = a);
-    document.querySelectorAll('.lbl-b').forEach(el => el.textContent = b);
-    document.getElementById('label-ab').textContent = 'Change ' + a + ' → ' + b;
-    document.getElementById('label-ba').textContent = 'Change ' + b + ' → ' + a;
-    if (lastResult) {
-      document.getElementById('leg-a').textContent = a + ': ' + fmt(lastResult.a);
-      document.getElementById('leg-b').textContent = b + ': ' + fmt(lastResult.b);
-    }
-  }
-
-  function calcManual() {
-    const a = parseFloat(document.getElementById('n1').value);
-    const b = parseFloat(document.getElementById('n2').value);
-    const res = document.getElementById('results');
-    const ph = document.getElementById('placeholder');
-    const addBtn = document.getElementById('add-btn');
-    if (isNaN(a) || isNaN(b)) {
-      res.style.display = 'none'; ph.style.display = 'block';
-      addBtn.disabled = true; lastResult = null; return;
-    }
-    res.style.display = 'block'; ph.style.display = 'none';
-    const d = calcDiff(a, b);
-    lastResult = { a, b, ...d, time: new Date().toISOString(), nameA: getA(), nameB: getB() };
-    document.getElementById('abs-val').textContent = fmt(d.abs);
-    document.getElementById('rel-val').textContent = fmtPct(d.rel);
-    const elAB = document.getElementById('change-ab');
-    elAB.textContent = signPct(d.chAB);
-    elAB.className = 'metric-value ' + (d.chAB >= 0 ? 'positive' : 'negative');
-    const elBA = document.getElementById('change-ba');
-    elBA.textContent = signPct(d.chBA);
-    elBA.className = 'metric-value ' + (d.chBA >= 0 ? 'positive' : 'negative');
-    const max = Math.max(Math.abs(a), Math.abs(b));
-    if (max > 0) {
-      document.getElementById('bar-a').style.width = (Math.abs(a) / max * 100) + '%';
-      document.getElementById('bar-b').style.width = (Math.abs(b) / max * 100) + '%';
-    }
-    document.getElementById('leg-a').textContent = getA() + ': ' + fmt(a);
-    document.getElementById('leg-b').textContent = getB() + ': ' + fmt(b);
-    if (tracking) addBtn.disabled = false;
-  }
-
-  function toggleTracking() {
-    tracking = document.getElementById('track-toggle').checked;
-    document.getElementById('history-section').style.display = tracking ? 'block' : 'none';
-    document.getElementById('label-row').style.display = tracking ? 'block' : 'none';
-    const addBtn = document.getElementById('add-btn');
-    addBtn.style.display = tracking ? 'inline-block' : 'none';
-    addBtn.disabled = !tracking || !lastResult;
-  }
-
-  async function addManualToHistory() {
-    if (!lastResult) return;
-    const label = document.getElementById('entry-label').value.trim();
-    colNameA = getA(); colNameB = getB();
-    entries.push({ ...lastResult, label });
-    renderHistory();
-    document.getElementById('add-btn').disabled = true;
-    await saveToStorage();
-  }
-
-  function setFileSource(src) {
-    fileSource = src;
-    document.getElementById('one-file-ui').style.display = src === 'one' ? 'block' : 'none';
-    document.getElementById('two-files-ui').style.display = src === 'two' ? 'block' : 'none';
-    document.getElementById('btn-one-file').classList.toggle('active', src === 'one');
-    document.getElementById('btn-two-files').classList.toggle('active', src === 'two');
-    checkFileCalcReady();
-  }
-
-  function onDragOver(e, id) { e.preventDefault(); document.getElementById(id).classList.add('drag'); }
-  function onDragLeave(id) { document.getElementById(id).classList.remove('drag'); }
-  function onDrop(e, slot) {
-    e.preventDefault();
-    const idMap = { one: 'drop-one', fa: 'drop-fa', fb: 'drop-fb' };
-    document.getElementById(idMap[slot]).classList.remove('drag');
-    const f = e.dataTransfer.files[0];
-    if (f) loadFile(f, slot);
-  }
-
-  function parseCSV(text) {
-    const lines = text.trim().split(/\r?\n/);
-    const sep = lines[0].includes('\t') ? '\t' : ',';
-    const headers = lines[0].split(sep).map(h => h.trim().replace(/^"|"$/g, ''));
-    const rows = lines.slice(1).map(l => {
-      const vals = l.split(sep).map(v => v.trim().replace(/^"|"$/g, ''));
-      const obj = {};
-      headers.forEach((h, i) => obj[h] = vals[i] ?? '');
-      return obj;
-    }).filter(r => Object.values(r).some(v => v !== ''));
-    return { headers, rows };
-  }
-
-  function loadFile(file, slot) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const parsed = parseCSV(e.target.result);
-      fileData[slot] = parsed;
-      const nameEl = document.getElementById('fname-' + slot);
-      if (nameEl) nameEl.textContent = '✓ ' + file.name + ' (' + parsed.rows.length + ' rows)';
-      if (slot === 'one') populateOneFileSelects(parsed.headers);
-      if (slot === 'fa' || slot === 'fb') checkTwoFiles();
-      checkFileCalcReady();
-      hideFileError();
-    };
-    reader.readAsText(file);
-  }
-
-  function populateOneFileSelects(headers) {
-    const selLabel = document.getElementById('sel-label-cols');
-    const selA = document.getElementById('sel-col-a');
-    const selB = document.getElementById('sel-col-b');
-    [selLabel, selA, selB].forEach(s => s.innerHTML = '');
-    headers.forEach(h => {
-      selLabel.add(new Option(h, h));
-      selA.add(new Option(h, h));
-      selB.add(new Option(h, h));
-    });
-    if (headers.length > 1) { selA.value = headers[headers.length - 2]; selB.value = headers[headers.length - 1]; }
-    document.getElementById('one-selects').style.display = 'flex';
-  }
-
-  function checkTwoFiles() {
-    const fa = fileData.fa, fb = fileData.fb;
-    if (!fa || !fb) return;
-    if (fa.headers.join('|') !== fb.headers.join('|')) {
-      showFileError('Column names do not match: [' + fa.headers.join(', ') + '] vs [' + fb.headers.join(', ') + ']');
-      document.getElementById('two-selects').style.display = 'none';
-      return;
-    }
-    hideFileError();
-    const selLabel2 = document.getElementById('sel-label-cols2');
-    const selVal = document.getElementById('sel-val-col');
-    [selLabel2, selVal].forEach(s => s.innerHTML = '');
-    fa.headers.forEach(h => { selLabel2.add(new Option(h, h)); selVal.add(new Option(h, h)); });
-    if (fa.headers.length > 0) selVal.value = fa.headers[fa.headers.length - 1];
-    document.getElementById('two-selects').style.display = 'flex';
-  }
-
-  function showFileError(msg) { const el = document.getElementById('file-error'); el.textContent = '⚠️ ' + msg; el.style.display = 'block'; }
-  function hideFileError() { document.getElementById('file-error').style.display = 'none'; }
-  function checkFileCalcReady() {
-    const btn = document.getElementById('file-calc-btn');
-    btn.disabled = fileSource === 'one' ? !fileData.one : (!fileData.fa || !fileData.fb);
-  }
-
-  function getSelectedOptions(selId) {
-    return Array.from(document.getElementById(selId).selectedOptions).map(o => o.value);
-  }
-
-  function calcFromFile() {
-    hideFileError();
-    let rows = [];
-    if (fileSource === 'one') {
-      const data = fileData.one; if (!data) return;
-      const labelCols = getSelectedOptions('sel-label-cols');
-      const colA = document.getElementById('sel-col-a').value;
-      const colB = document.getElementById('sel-col-b').value;
-      if (!colA || !colB) { showFileError('Please select columns A and B'); return; }
-      colNameA = colA; colNameB = colB;
-      data.rows.forEach(row => {
-        const a = parseFloat(row[colA]), b = parseFloat(row[colB]);
-        if (isNaN(a) || isNaN(b)) return;
-        const label = labelCols.length ? labelCols.map(c => row[c]).join('_') : '';
-        const d = calcDiff(a, b);
-        rows.push({ a, b, ...d, label, nameA: colA, nameB: colB, time: new Date().toISOString() });
-      });
+const store={
+  _ws(){ return typeof window!=='undefined'&&window.storage; },
+  async get(k){
+    try{
+      if(this._ws()){ const r=await window.storage.get(k); return r?r.value:null; }
+      return localStorage.getItem(k);
+    }catch(e){ return null; }
+  },
+  async set(k,v){
+    if(this._ws()){
+      const r=await window.storage.set(k,v);
+      if(!r) throw new Error('window.storage returned null');
     } else {
-      const fa = fileData.fa, fb = fileData.fb; if (!fa || !fb) return;
-      if (fa.headers.join('|') !== fb.headers.join('|')) { showFileError('Column names do not match'); return; }
-      const labelCols = getSelectedOptions('sel-label-cols2');
-      const valCol = document.getElementById('sel-val-col').value;
-      colNameA = 'File A'; colNameB = 'File B';
-      const keyFn = row => labelCols.length ? labelCols.map(c => row[c]).join('_') : JSON.stringify(row);
-      const mapA = {}, mapB = {};
-      fa.rows.forEach(r => { mapA[keyFn(r)] = parseFloat(r[valCol]); });
-      fb.rows.forEach(r => { mapB[keyFn(r)] = parseFloat(r[valCol]); });
-      const keys = [...new Set([...Object.keys(mapA), ...Object.keys(mapB)])];
-      keys.forEach(k => {
-        const a = mapA[k], b = mapB[k];
-        if (isNaN(a) || isNaN(b)) return;
-        const d = calcDiff(a, b);
-        rows.push({ a, b, ...d, label: k, nameA: 'File A', nameB: 'File B', time: new Date().toISOString() });
-      });
+      localStorage.setItem(k,v);
     }
-    if (!rows.length) { showFileError('No valid rows found — check selected columns'); return; }
-    entries = [...entries, ...rows];
-    renderHistory();
-    document.getElementById('history-section').style.display = 'block';
-    saveToStorage();
-    showToast('Added ' + rows.length + ' rows', false);
   }
+};
 
-  function getFilteredEntries() {
-    const topN = parseInt(document.getElementById('top-select').value) || 0;
-    const sortCol = document.getElementById('sort-col-select').value;
-    const sortDir = document.getElementById('sort-dir-select').value;
-    let list = [...entries];
-    if (sortCol !== 'none') {
-      list.sort((x, y) => {
-        const vx = isFinite(x[sortCol]) ? x[sortCol] : (sortDir === 'desc' ? -Infinity : Infinity);
-        const vy = isFinite(y[sortCol]) ? y[sortCol] : (sortDir === 'desc' ? -Infinity : Infinity);
-        return sortDir === 'desc' ? vy - vx : vx - vy;
-      });
-    }
-    return topN > 0 ? list.slice(0, topN) : list;
+const fmt=n=>parseFloat(n.toPrecision(6)).toLocaleString();
+const fmtP=n=>isFinite(n)?n.toFixed(2)+'%':'∞';
+const sgnP=n=>(n>=0?'+':'')+fmtP(n);
+
+function diff(a,b){
+  const abs=Math.abs(a-b),avg=(Math.abs(a)+Math.abs(b))/2;
+  const rel=avg===0?Infinity:(abs/avg)*100;
+  const chAB=a===0?Infinity:((b-a)/Math.abs(a))*100;
+  const chBA=b===0?Infinity:((a-b)/Math.abs(b))*100;
+  return{abs,rel,chAB,chBA};
+}
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',i===(t==='manual'?0:1)));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  document.getElementById('hist').style.display=entries.length?'block':(t==='manual'&&tracking?'block':'none');
+}
+
+function mA(){return document.getElementById('m-na').value.trim()||'A';}
+function mB(){return document.getElementById('m-nb').value.trim()||'B';}
+function updManLabels(){
+  const a=mA(),b=mB();
+  document.querySelectorAll('.mla').forEach(e=>e.textContent=a);
+  document.querySelectorAll('.mlb').forEach(e=>e.textContent=b);
+  document.getElementById('m-lab-ab').textContent='Change '+a+'→'+b;
+  document.getElementById('m-lab-ba').textContent='Change '+b+'→'+a;
+  if(lastManual){document.getElementById('m-la').textContent=a+': '+fmt(lastManual.a);document.getElementById('m-lb').textContent=b+': '+fmt(lastManual.b);}
+}
+function calcManual(){
+  const a=parseFloat(document.getElementById('m-n1').value),b=parseFloat(document.getElementById('m-n2').value);
+  const res=document.getElementById('m-results'),ph=document.getElementById('m-ph'),btn=document.getElementById('m-add-btn');
+  if(isNaN(a)||isNaN(b)){res.style.display='none';ph.style.display='block';btn.disabled=true;lastManual=null;return;}
+  res.style.display='block';ph.style.display='none';
+  const d=diff(a,b);lastManual={a,b,...d,nameA:mA(),nameB:mB(),time:new Date().toISOString()};
+  document.getElementById('m-abs').textContent=fmt(d.abs);
+  document.getElementById('m-rel').textContent=fmtP(d.rel);
+  const eAB=document.getElementById('m-chab');eAB.textContent=sgnP(d.chAB);eAB.className='metric-value '+(d.chAB>=0?'pos':'neg');
+  const eBA=document.getElementById('m-chba');eBA.textContent=sgnP(d.chBA);eBA.className='metric-value '+(d.chBA>=0?'pos':'neg');
+  const mx=Math.max(Math.abs(a),Math.abs(b));
+  if(mx>0){document.getElementById('m-ba').style.width=(Math.abs(a)/mx*100)+'%';document.getElementById('m-bb').style.width=(Math.abs(b)/mx*100)+'%';}
+  document.getElementById('m-la').textContent=mA()+': '+fmt(a);
+  document.getElementById('m-lb').textContent=mB()+': '+fmt(b);
+  if(tracking)btn.disabled=false;
+}
+function onTrack(){
+  tracking=document.getElementById('track-tog').checked;
+  document.getElementById('hist').style.display=tracking?'block':'none';
+  document.getElementById('m-label-row').style.display=tracking?'block':'none';
+  const btn=document.getElementById('m-add-btn');
+  btn.style.display=tracking?'inline-block':'none';btn.disabled=!tracking||!lastManual;
+}
+async function addManual(){
+  if(!lastManual)return;
+  const label=document.getElementById('m-label').value.trim();
+  entries.push({...lastManual,label,source:'manual'});
+  renderHist();document.getElementById('m-add-btn').disabled=true;await save();
+}
+
+function dov(e,id){e.preventDefault();document.getElementById(id).classList.add('drag');}
+function dlv(id){document.getElementById(id).classList.remove('drag');}
+function ddrop(e,slot){e.preventDefault();dlv('drop-'+slot);const f=e.dataTransfer.files[0];if(f)loadFile(f,slot);}
+
+function parseCSV(txt){
+  txt=txt.replace(/^\uFEFF/,''); // strip UTF-8 BOM
+  const lines=txt.trim().split(/\r?\n/);
+  const sep=lines[0].includes('\t')?'\t':',';
+  const headers=lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,''));
+  const rows=lines.slice(1).map(l=>{
+    const vals=l.split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
+    const o={};headers.forEach((h,i)=>o[h]=vals[i]??'');return o;
+  }).filter(r=>Object.values(r).some(v=>v!==''));
+  return{headers,rows};
+}
+
+function loadFile(file,slot){
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    fd[slot]=parseCSV(e.target.result);
+    document.getElementById('fn-'+slot).textContent='✓ '+file.name+' ('+fd[slot].rows.length+' rows)';
+    filtersState[slot]=[];
+    renderFilters(slot);
+    document.getElementById('filt-'+slot+'-wrap').style.display='block';
+    tryBuildCfg();
+  };
+  r.readAsText(file);
+}
+
+// ── Filter state ─────────────────────────────────────────────────────────────
+// filtersState[slot] = [{col, vals: Set}]
+const filtersState={a:[],b:[]};
+
+function renderFilters(slot){
+  const list=document.getElementById('filters-'+slot+'-list');
+  if(!list)return;
+  list.innerHTML='';
+  filtersState[slot].forEach((f,i)=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;padding:8px 10px;background:#f9f9f8;border-radius:8px;border:0.5px solid rgba(0,0,0,0.08);flex-wrap:wrap;';
+    // col select
+    const colSel=document.createElement('select');
+    colSel.style.cssText='flex:0 0 auto;min-width:130px;padding:5px 8px;font-size:12px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;';
+    const headers=fd[slot]?fd[slot].headers:[];
+    headers.forEach(h=>{const o=new Option(h,h);if(h===f.col)o.selected=true;colSel.add(o);});
+    colSel.onchange=e=>{
+      filtersState[slot][i].col=e.target.value;
+      filtersState[slot][i].vals=new Set(getUniq(slot,e.target.value));
+      renderFilters(slot);
+    };
+    // vals multiselect
+    const valSel=document.createElement('select');
+    valSel.multiple=true;
+    valSel.style.cssText='flex:1;min-width:150px;height:72px;padding:4px 8px;font-size:12px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;';
+    const uniq=getUniq(slot,f.col);
+    uniq.forEach(v=>{const o=new Option(v,v);o.selected=f.vals.has(v);valSel.add(o);});
+    valSel.onchange=()=>{
+      filtersState[slot][i].vals=new Set(Array.from(valSel.selectedOptions).map(o=>o.value));
+    };
+    // delete
+    const del=document.createElement('span');del.textContent='×';
+    del.style.cssText='color:#bbb;cursor:pointer;font-size:16px;padding:0 4px;line-height:1.8;';
+    del.onmouseenter=()=>del.style.color='#D85A30';del.onmouseleave=()=>del.style.color='#bbb';
+    del.onclick=()=>{filtersState[slot].splice(i,1);renderFilters(slot);};
+    row.append(colSel,valSel,del);
+    list.appendChild(row);
+  });
+}
+
+function getUniq(slot,col){
+  if(!fd[slot]||!col)return[];
+  return[...new Set(fd[slot].rows.map(r=>r[col]).filter(v=>v!==''))].sort();
+}
+
+function addFilter(slot){
+  if(!fd[slot])return;
+  const firstCol=fd[slot].headers[0]||'';
+  filtersState[slot].push({col:firstCol,vals:new Set(getUniq(slot,firstCol))});
+  renderFilters(slot);
+}
+
+function tryBuildCfg(){
+  if(!fd.a||!fd.b)return;
+  const ha=fd.a.headers,hb=fd.b.headers;
+  const common=ha.filter(h=>hb.includes(h));
+  const segSel=document.getElementById('seg-col');
+  segSel.innerHTML='';
+  common.forEach(h=>{const o=new Option(h,h);o.selected=false;segSel.add(o);});
+  if(segSel.options.length>0)segSel.options[0].selected=true;
+  const mBoth=document.getElementById('metric-both'),mA=document.getElementById('metric-a'),mB=document.getElementById('metric-b');
+  mBoth.innerHTML='';mA.innerHTML='';mB.innerHTML='';
+  common.forEach(h=>mBoth.add(new Option(h,h)));
+  ha.forEach(h=>mA.add(new Option(h,h)));
+  hb.forEach(h=>mB.add(new Option(h,h)));
+  if(common.length>1)mBoth.value=common[common.length-1];
+  document.getElementById('cfg-wrap').style.display='block';
+}
+
+function onSameMetric(){
+  const same=document.getElementById('same-metric-tog').checked;
+  document.getElementById('same-metric-ui').style.display=same?'block':'none';
+  document.getElementById('diff-metric-ui').style.display=same?'none':'block';
+}
+
+let overrides=[];
+function colOptsA(){return fd.a?fd.a.headers:[];}
+function colOptsB(){return fd.b?fd.b.headers:[];}
+function mkSelect(cols,val){
+  const s=document.createElement('select');
+  s.style.cssText='flex:1;min-width:100px;padding:5px 8px;font-size:12px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;';
+  cols.forEach(c=>{const o=new Option(c,c);if(c===val)o.selected=true;s.add(o);});
+  return s;
+}
+function getSegKeys(){
+  // returns sorted unique composite keys from both files based on current seg col selection
+  const segSel=document.getElementById('seg-col');
+  const segCols=Array.from(segSel.selectedOptions).map(o=>o.value);
+  if(!segCols.length||!fd.a||!fd.b)return[];
+  const makeKey=(r,cols)=>cols.map(c=>r[c]??'').join('_');
+  const keys=new Set();
+  [...fd.a.rows,...fd.b.rows].forEach(r=>{const k=makeKey(r,segCols);if(k)keys.add(k);});
+  return[...keys].sort();
+}
+
+// glob: * matches anything
+function globMatch(pattern,str){
+  const re=new RegExp('^'+pattern.split('*').map(s=>s.replace(/[.+?^${}()|[\]\\]/g,'\\$&')).join('.*')+'$');
+  return re.test(str);
+}
+function matchedKeys(pattern){
+  const keys=getSegKeys();
+  if(!pattern)return[];
+  return keys.filter(k=>globMatch(pattern,k));
+}
+
+function renderOverrides(){
+  const list=document.getElementById('overrides-list');
+  if(!list)return;
+  list.innerHTML='';
+  overrides.forEach((ov,i)=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;margin-bottom:6px;padding:8px 10px;background:#f9f9f8;border-radius:8px;border:0.5px solid rgba(0,0,0,0.08);';
+    // pattern input + match count
+    const segWrap=document.createElement('div');
+    segWrap.style.cssText='display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px;';
+    const segLbl=document.createElement('span');segLbl.textContent='Segment pattern (use * as wildcard)';segLbl.style.cssText='font-size:11px;color:#888;';
+    const patInp=document.createElement('input');
+    patInp.type='text';patInp.placeholder='e.g.  *.ru  or  mobile_*  or  exact_val';
+    patInp.value=ov.pattern||'';
+    patInp.style.cssText='width:100%;padding:6px 8px;font-size:13px;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;';
+    const matchHint=document.createElement('span');
+    matchHint.style.cssText='font-size:11px;color:#1D9E75;min-height:14px;';
+    const updateHint=()=>{
+      const m=matchedKeys(patInp.value.trim());
+      matchHint.textContent=patInp.value.trim()?(m.length?'✓ matches '+m.length+' segment'+(m.length>1?'s':''):'⚠ no matches'):'';
+    };
+    patInp.oninput=e=>{overrides[i].pattern=e.target.value;updateHint();};
+    updateHint();
+    segWrap.append(segLbl,patInp,matchHint);
+    // metric A
+    const aWrap=document.createElement('div');
+    aWrap.style.cssText='display:flex;flex-direction:column;gap:3px;min-width:120px;';
+    const aLbl=document.createElement('span');aLbl.textContent='Metric A';aLbl.style.cssText='font-size:11px;color:#888;';
+    const selA=mkSelect(colOptsA(),ov.metA);
+    selA.onchange=e=>{overrides[i].metA=e.target.value;};
+    aWrap.append(aLbl,selA);
+    // metric B
+    const bWrap=document.createElement('div');
+    bWrap.style.cssText='display:flex;flex-direction:column;gap:3px;min-width:120px;';
+    const bLbl=document.createElement('span');bLbl.textContent='Metric B';bLbl.style.cssText='font-size:11px;color:#888;';
+    const selB=mkSelect(colOptsB(),ov.metB);
+    selB.onchange=e=>{overrides[i].metB=e.target.value;};
+    bWrap.append(bLbl,selB);
+    // delete
+    const del=document.createElement('span');del.textContent='×';
+    del.style.cssText='color:#bbb;cursor:pointer;font-size:16px;padding:0 4px;line-height:2.4;';
+    del.onmouseenter=()=>del.style.color='#D85A30';del.onmouseleave=()=>del.style.color='#bbb';
+    del.onclick=()=>{overrides.splice(i,1);renderOverrides();};
+    row.append(segWrap,aWrap,bWrap,del);
+    list.appendChild(row);
+  });
+}
+function addOverride(){
+  const same=document.getElementById('same-metric-tog').checked;
+  const defA=same?document.getElementById('metric-both').value:document.getElementById('metric-a').value;
+  const defB=same?document.getElementById('metric-both').value:document.getElementById('metric-b').value;
+  overrides.push({pattern:'',metA:defA||'',metB:defB||''});
+  renderOverrides();
+}
+
+function getFilteredRows(slot){
+  let rows=fd[slot].rows;
+  for(const f of filtersState[slot]){
+    if(f.col&&f.vals.size>0) rows=rows.filter(r=>f.vals.has(r[f.col]));
   }
+  return rows;
+}
 
-  function renderHistory() {
-    const body = document.getElementById('history-body');
-    const head = document.getElementById('table-head');
-    const empty = document.getElementById('history-empty');
-    const wrap = document.getElementById('history-table-wrap');
-    document.getElementById('history-count').textContent = entries.length ? '(' + entries.length + ')' : '';
-    updateExportButtons();
-    if (!entries.length) { empty.style.display = 'block'; wrap.style.display = 'none'; return; }
-    empty.style.display = 'none'; wrap.style.display = 'block';
-    const nA = entries[0]?.nameA || colNameA || 'A';
-    const nB = entries[0]?.nameB || colNameB || 'B';
-    head.innerHTML = `<th>#</th><th>Label</th><th>${nA}</th><th>${nB}</th><th>|A−B|</th><th>Relative %</th><th></th>`;
-    const list = getFilteredEntries();
-    body.innerHTML = list.map(r => {
-      const origIdx = entries.indexOf(r);
-      return `<tr>
-        <td style="color:#aaa">${origIdx + 1}</td>
-        <td style="color:#555;">${r.label || '<span style="color:#ccc">—</span>'}</td>
-        <td>${fmt(r.a)}</td>
-        <td>${fmt(r.b)}</td>
-        <td>${fmt(r.abs)}</td>
-        <td>${fmtPct(r.rel)}</td>
-        <td class="td-del" onclick="removeEntry(${origIdx})" title="Remove">×</td>
-      </tr>`;
-    }).join('');
-  }
+function showErr(msg){const e=document.getElementById('f-err');e.textContent='⚠️ '+msg;e.style.display='block';}
+function hideErr(){document.getElementById('f-err').style.display='none';}
 
-  function removeEntry(idx) { entries.splice(idx, 1); renderHistory(); saveToStorage(); }
+function calcFiles(){
+  hideErr();
+  const segSel=document.getElementById('seg-col');
+  const segCols=Array.from(segSel.selectedOptions).map(o=>o.value);
+  const same=document.getElementById('same-metric-tog').checked;
+  const mColA=same?document.getElementById('metric-both').value:document.getElementById('metric-a').value;
+  const mColB=same?document.getElementById('metric-both').value:document.getElementById('metric-b').value;
+  const dispA=document.getElementById('disp-a').value.trim()||mColA+' (A)';
+  const dispB=document.getElementById('disp-b').value.trim()||mColB+' (B)';
+  if(!segCols.length){showErr('Please select at least one segment column');return;}
+  if(!mColA||!mColB){showErr('Please select metric column(s)');return;}
+  const rowsA=getFilteredRows('a'),rowsB=getFilteredRows('b');
+  const makeKey=(r,cols)=>cols.map(c=>r[c]??'').join('_');
+  // build override lookup: segValue -> {metA, metB} using glob patterns
+  const ovMap={};
+  const allKeys=[...new Set([...getFilteredRows('a'),...getFilteredRows('b')].map(r=>makeKey(r,segCols)).filter(k=>k))];
+  overrides.forEach(ov=>{
+    if(!ov.pattern)return;
+    allKeys.forEach(k=>{if(globMatch(ov.pattern,k))ovMap[k]={metA:ov.metA,metB:ov.metB};});
+  });
+  // build per-key maps using default metric, then patch overrides
+  const mapA={},mapB={};
+  rowsA.forEach(r=>{
+    const k=makeKey(r,segCols);if(k==='')return;
+    const m=ovMap[k]?ovMap[k].metA:mColA;
+    mapA[k]=parseFloat(r[m]);
+  });
+  rowsB.forEach(r=>{
+    const k=makeKey(r,segCols);if(k==='')return;
+    const m=ovMap[k]?ovMap[k].metB:mColB;
+    mapB[k]=parseFloat(r[m]);
+  });
+  const keys=[...new Set([...Object.keys(mapA),...Object.keys(mapB)])];
+  const newEntries=[],skipped=[];
+  keys.forEach(k=>{
+    const a=mapA[k],b=mapB[k];
+    if(isNaN(a)||isNaN(b)){skipped.push(k);return;}
+    const d=diff(a,b);
+    const hasOv=!!ovMap[k];
+    newEntries.push({label:k+(hasOv?' *':''),a,b,...d,nameA:dispA,nameB:dispB,time:new Date().toISOString(),source:'file'});
+  });
+  if(!newEntries.length){showErr('No matching rows found for the selected segment column');return;}
+  entries=[...entries,...newEntries];
+  renderHist();document.getElementById('hist').style.display='block';save();
+  toast('Added '+newEntries.length+' rows'+(skipped.length?' ('+skipped.length+' skipped — non-numeric)':''),false);
+}
 
-  function updateExportButtons() {
-    const disabled = !entries.length;
-    document.querySelectorAll('.btn-export').forEach(b => {
-      b.disabled = disabled; b.style.opacity = disabled ? '0.35' : '1'; b.style.cursor = disabled ? 'default' : 'pointer';
-    });
-  }
+function getVis(){
+  const topN=parseInt(document.getElementById('top-sel').value)||0;
+  const sc=document.getElementById('sort-col').value,sd=document.getElementById('sort-dir').value;
+  let list=[...entries];
+  if(sc!=='none')list.sort((x,y)=>{
+    const vx=isFinite(x[sc])?x[sc]:(sd==='desc'?-Infinity:Infinity);
+    const vy=isFinite(y[sc])?y[sc]:(sd==='desc'?-Infinity:Infinity);
+    return sd==='desc'?vy-vx:vx-vy;
+  });
+  return topN>0?list.slice(0,topN):list;
+}
 
-  function exportCSV() {
-    if (!entries.length) { showToast('No data to export', true); return; }
-    const nA = entries[0]?.nameA || colNameA || 'A';
-    const nB = entries[0]?.nameB || colNameB || 'B';
-    const header = ['Label', nA, nB, `|${nA}-${nB}|`, 'Relative %', 'Timestamp'].join(',');
-    const rows = entries.map(r => [
-      '"' + (r.label || '').replace(/"/g, '""') + '"',
-      r.a, r.b,
-      r.abs.toFixed(6),
-      isFinite(r.rel) ? r.rel.toFixed(4) : 'Infinity',
-      r.time
-    ].join(','));
-    download('diff_history.csv', [header, ...rows].join('\n'), 'text/csv');
-    showToast('CSV saved (' + entries.length + ' rows)', false);
-  }
+function renderHist(){
+  const body=document.getElementById('h-body'),head=document.getElementById('h-head');
+  const empty=document.getElementById('h-empty'),wrap=document.getElementById('h-tbl-wrap');
+  document.getElementById('h-count').textContent=entries.length?'('+entries.length+')':'';
+  updExpBtns();
+  if(!entries.length){empty.style.display='block';wrap.style.display='none';return;}
+  empty.style.display='none';wrap.style.display='block';
+  const nA=entries[0]?.nameA||'A',nB=entries[0]?.nameB||'B';
+  head.innerHTML=`<th>#</th><th>Segment / Label</th><th>${nA}</th><th>${nB}</th><th>|A−B|</th><th>Relative %</th><th>Change A→B</th><th>Change B→A</th><th></th>`;
+  body.innerHTML=getVis().map(r=>{
+    const oi=entries.indexOf(r);
+    return`<tr><td style="color:#aaa">${oi+1}</td><td style="color:#555">${r.label||'<span style="color:#ccc">—</span>'}</td><td>${fmt(r.a)}</td><td>${fmt(r.b)}</td><td>${fmt(r.abs)}</td><td>${fmtP(r.rel)}</td><td class="${r.chAB>=0?'tdpos':'tdneg'}">${sgnP(r.chAB)}</td><td class="${r.chBA>=0?'tdpos':'tdneg'}">${sgnP(r.chBA)}</td><td class="tddel" onclick="delEntry(${oi})">×</td></tr>`;
+  }).join('');
+}
 
-  function exportJSON() {
-    if (!entries.length) { showToast('No data to export', true); return; }
-    const nA = entries[0]?.nameA || colNameA || 'A';
-    const nB = entries[0]?.nameB || colNameB || 'B';
-    const data = entries.map(r => ({
-      label: r.label || '',
-      [nA]: r.a,
-      [nB]: r.b,
-      abs_diff: r.abs,
-      relative_pct: isFinite(r.rel) ? r.rel : null,
-      timestamp: r.time
-    }));
-    download('diff_history.json', JSON.stringify(data, null, 2), 'application/json');
-    showToast('JSON saved (' + entries.length + ' entries)', false);
-  }
+function delEntry(i){entries.splice(i,1);renderHist();save();}
+function updExpBtns(){const d=!entries.length;document.querySelectorAll('.btn-exp').forEach(b=>{b.disabled=d;b.style.opacity=d?'0.35':'1';b.style.cursor=d?'default':'pointer';});}
 
-  function download(filename, content, type) {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([content], { type }));
-    a.download = filename; document.body.appendChild(a); a.click();
-    document.body.removeChild(a); URL.revokeObjectURL(a.href);
-  }
+function expCSV(){
+  if(!entries.length){toast('No data',true);return;}
+  const nA=entries[0]?.nameA||'A',nB=entries[0]?.nameB||'B';
+  const hdr=['Segment/Label',nA,nB,'|A-B|','Relative %','Change A→B %','Change B→A %','Timestamp'].join(',');
+  const rows=entries.map(r=>['"'+(r.label||'').replace(/"/g,'""')+'"',r.a,r.b,r.abs.toFixed(6),isFinite(r.rel)?r.rel.toFixed(4):'Infinity',isFinite(r.chAB)?r.chAB.toFixed(4):'Infinity',isFinite(r.chBA)?r.chBA.toFixed(4):'Infinity',r.time].join(','));
+  dl('diff_results.csv',[hdr,...rows].join('\n'),'text/csv');
+  toast('CSV saved ('+entries.length+' rows)',false);
+}
+function expJSON(){
+  if(!entries.length){toast('No data',true);return;}
+  const nA=entries[0]?.nameA||'A',nB=entries[0]?.nameB||'B';
+  const data=entries.map(r=>({segment:r.label||'',[nA]:r.a,[nB]:r.b,abs_diff:r.abs,relative_pct:isFinite(r.rel)?r.rel:null,change_a_to_b_pct:isFinite(r.chAB)?r.chAB:null,change_b_to_a_pct:isFinite(r.chBA)?r.chBA:null,timestamp:r.time}));
+  dl('diff_results.json',JSON.stringify(data,null,2),'application/json');
+  toast('JSON saved ('+entries.length+' entries)',false);
+}
+function dl(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);}
+function clearHist(){if(!entries.length)return;entries=[];renderHist();save();document.getElementById('hist').style.display='none';}
 
-  function clearHistory() {
-    if (!entries.length) return;
-    entries = []; renderHistory(); saveToStorage();
-    document.getElementById('history-section').style.display = 'none';
-  }
-
-  async function saveToStorage() {
-    const badge = document.getElementById('storage-badge');
-    try {
-      badge.textContent = 'saving…';
-      await store.set(STORAGE_KEY, JSON.stringify(entries));
-      badge.textContent = 'saved ✓';
-      setTimeout(() => badge.textContent = '', 1800);
-    } catch(e) { badge.textContent = ''; showToast('Could not save', true); }
-  }
-
-  async function loadFromStorage() {
-    const badge = document.getElementById('storage-badge');
-    badge.textContent = 'loading…';
-    try {
-      const val = await store.get(STORAGE_KEY);
-      if (val) {
-        entries = JSON.parse(val);
-        if (entries.length) { renderHistory(); document.getElementById('history-section').style.display = 'block'; }
-        badge.textContent = entries.length ? '(' + entries.length + ' saved)' : '';
-        setTimeout(() => badge.textContent = '', 2500);
-      } else badge.textContent = '';
-    } catch(e) { badge.textContent = ''; }
-  }
-
-  function showToast(msg, isError) {
-    let t = document.getElementById('toast');
-    if (!t) {
-      t = document.createElement('div'); t.id = 'toast';
-      t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;pointer-events:none;transition:opacity 0.3s;z-index:999;';
-      document.body.appendChild(t);
-    }
-    t.textContent = msg;
-    t.style.background = isError ? '#fff0ed' : '#f0f6ff';
-    t.style.color = isError ? '#D85A30' : '#185FA5';
-    t.style.border = isError ? '0.5px solid rgba(216,90,48,0.3)' : '0.5px solid rgba(55,138,221,0.3)';
-    t.style.opacity = '1';
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.style.opacity = '0', 2500);
-  }
-
-  loadFromStorage();
+async function save(){
+  const b=document.getElementById('sbadge');
+  try{
+    b.textContent='saving…';
+    const payload=JSON.stringify(entries,(_,v)=>typeof v==='number'&&!isFinite(v)?null:v);
+    const result=await window.storage.set(SKEY,payload);
+    if(!result) throw new Error('storage returned null (payload '+Math.round(payload.length/1024)+'kb)');
+    b.textContent='saved ✓';setTimeout(()=>b.textContent='',1800);
+  }catch(e){b.textContent='';toast('Could not save: '+e.message,true);}
+}
+async function load(){
+  const b=document.getElementById('sbadge');b.textContent='loading…';
+  try{const v=await store.get(SKEY);if(v){entries=JSON.parse(v);if(entries.length){renderHist();document.getElementById('hist').style.display='block';}}b.textContent=entries.length?'('+entries.length+' saved)':'';setTimeout(()=>b.textContent='',2500);}
+  catch(e){b.textContent='';}
+}
+function toast(msg,err){
+  let t=document.getElementById('_toast');
+  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;pointer-events:none;transition:opacity .3s;z-index:999;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.background=err?'#fff0ed':'#f0f6ff';t.style.color=err?'#D85A30':'#185FA5';t.style.border=err?'0.5px solid rgba(216,90,48,0.3)':'0.5px solid rgba(55,138,221,0.3)';
+  t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',2800);
+}
+load();
 </script>
 </body>
 </html>
