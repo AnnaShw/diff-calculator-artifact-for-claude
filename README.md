@@ -1,6 +1,6 @@
 # Difference Calculator
 
-A lightweight, single-file tool for comparing numbers — manually or from CSV files. No dependencies, no build step — just open the HTML file in a browser.
+A single-file tool for comparing numbers — manually, from CSV files, or via in-file pivot. No dependencies, no build step — open the HTML file in any browser.
 
 ## Features
 
@@ -26,53 +26,83 @@ A lightweight, single-file tool for comparing numbers — manually or from CSV f
 - **Same or different metric columns** per file
 - **Custom display names** for File A and File B values
 
+### Pivot mode
+- Compare two groups **within a single file** — like an Excel pivot table
+- Pick a **pivot column** whose values define the two sides (e.g. `period`, `source`, `country`)
+- Click pills to select **Value A** and **Value B**
+- **Multiple metrics at once** — select several metric columns; each becomes its own comparison group with display names auto-filled as `{pivotValue}_{metricName}`
+- **Segment drilldown** — when multiple metrics are selected, optionally enable segment breakdown:
+  - Each metric shows as a single summary row
+  - A **▸ N** expand button reveals inline sub-rows with the full segment breakdown
+  - Multiple rows can be expanded simultaneously
+- **Aggregation** — sum, average, or first value when multiple rows share the same segment key
+- **Pre-filters** — narrow the data before pivoting (AND logic)
+
+### Results table
+- **Grouped by metric pair** — when you calculate multiple times with different metrics, each pair gets its own labeled section with a colored group header
+- **Column names sub-header** — each group shows the actual A and B column names in indigo/emerald so you always know which value is which
+- **Total row** per group — sums A and B across all rows in the group and computes the diff (suppressed for single-row multi-metric groups)
+- **Clickable column sort** — click any header (Segment, A, B, |A−B|, Relative %) to sort asc/desc within each group
+- **Top N filter** — show only the top 5 / 10 / 20 rows per group
+
+### Export
+- **CSV** — wide flat table: one row per segment, one column group per metric pair; includes a TOTAL row at the bottom
+- **JSON** — one object per segment with nested keys per metric pair
+
 ---
 
 ## Using as a Claude Artifact
 
-You can run this calculator directly inside Claude as a persistent artifact with cross-session storage powered by Claude's built-in storage API.
+Run the calculator directly inside Claude as a persistent artifact with cross-session storage.
 
-**To add it to a Claude conversation:**
+**To add it to a conversation:**
 1. Open [claude.ai](https://claude.ai)
-2. Start a new conversation and paste the following prompt:
+2. Start a new conversation and paste:
 
 ```
 Here is the source of a difference calculator tool. Please render it as an artifact with persistent storage using window.storage so my history is saved between sessions.
 [paste the contents of diff_calculator.html here]
 ```
 
-3. Claude will render it inline — your history will be saved automatically and restored each time you return to that conversation.
+3. Claude renders it inline — history is saved automatically and restored each session.
 
-**How the storage works:**
-
-The tool automatically picks the best available storage backend:
+**Storage backends:**
 
 | Context | Storage used | Persists across |
 |---|---|---|
 | Browser (standalone) | `localStorage` | Browser sessions on same device |
 | Claude artifact | `window.storage` | Claude conversations (same account) |
 
-When `window.storage` is available (inside Claude), it takes priority. Otherwise the tool falls back to `localStorage` silently — no configuration needed.
+`window.storage` takes priority when available. Otherwise falls back to `localStorage` silently.
 
 ---
 
 ## Usage
 
 ### Manual
-1. Download `diff_calculator.html`
-2. Open it in any browser
-3. Enter two numbers — results appear instantly
-4. Toggle **Track history** to start logging comparisons
-5. Click **+ Add** to save a result, then **↓ CSV** or **↓ JSON** to export
+1. Download `diff_calculator.html` and open it in any browser
+2. Enter two numbers — results appear instantly
+3. Toggle **Track history** to start logging comparisons
+4. Click **+ Add** to save a result, then **↓ CSV** or **↓ JSON** to export
 
 ### From Files
-1. Switch to the **📂 From Files** tab
+1. Switch to the **⇄ Files** tab
 2. Drop or browse for File A and File B (CSV or TSV)
-3. Optionally add filters per file via **+ Add filter**
+3. Optionally add filters per file via **+ filter**
 4. Select segment column(s) for the join key
 5. Choose the metric column(s) to compare
-6. Optionally add **Metric Overrides** for segments that use a different metric
+6. Optionally add **Metric Overrides** for segments that use a different metric column
 7. Click **⚡ Calculate**
+
+### Pivot
+1. Switch to the **⊞ Pivot** tab
+2. Drop or browse for a single CSV or TSV file
+3. Optionally add pre-filters
+4. Select the **pivot column** and click two value pills to set A and B
+5. Select one or more **metric columns**
+6. If a single metric: select segment columns for the row key
+7. If multiple metrics: optionally enable **segment drilldown** via the toggle
+8. Click **⚡ Calculate**
 
 ---
 
@@ -81,8 +111,9 @@ When `window.storage` is available (inside Claude), it takes priority. Otherwise
 **Data & Analytics**
 - Comparing query results across environments (dev vs prod, two DB replicas)
 - Spot-checking metric changes between reporting periods
-- Validating ETL outputs — e.g. row counts before and after a pipeline run
-- Cross-source reconciliation with different metric column names per source
+- Validating ETL outputs — row counts before and after a pipeline run
+- Cross-source reconciliation when metric column names differ per source
+- Comparing multiple metrics at once across two time periods or environments
 
 **Finance & Business**
 - Revenue or cost comparisons across quarters or years
@@ -108,7 +139,7 @@ When `window.storage` is available (inside Claude), it takes priority. Otherwise
 
 ## Notes
 
-- History is saved automatically and persists between sessions (via `localStorage` in standalone mode, `window.storage` in Claude)
+- History is saved automatically and persists between sessions (`localStorage` standalone, `window.storage` in Claude)
 - CSV files with UTF-8 BOM are handled correctly
-- Scientific notation values (e.g. `3.07E+07`) are parsed correctly
 - Clearing browser data will reset history in standalone mode
+- Drilldown sub-rows are not included in CSV/JSON exports — only the summary metric row is exported
