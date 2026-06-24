@@ -17,12 +17,10 @@ A single-file tool for comparing numbers — manually, from CSV files, or via in
 - Load two CSV or TSV files and compare them row-by-row
 - **Multi-column filters** — add any number of column+values filter rows per file (AND logic between rows)
 - **Segment columns** — select one or more columns as the join key; multiple columns are concatenated with `_`
-- **Metric overrides** — assign a different metric column to specific segments using glob patterns:
-  - `*_RTB` — matches all segments ending in `_RTB`
-  - `mobile_*` — matches all segments starting with `mobile_`
-  - `*banner*` — matches segments containing `banner`
-  - `exact_value` — exact match
-  - Live match count shown as you type
+- **Multiple metrics at once** — select several metric columns; each becomes its own summary row
+- **Segment drilldown** — when multiple metrics are selected, optionally enable segment breakdown:
+  - Each metric shows as a single summary row
+  - A **▸ N** expand button reveals inline sub-rows with the full segment breakdown
 - **Same or different metric columns** per file
 - **Custom display names** for File A and File B values
 
@@ -91,7 +89,7 @@ Here is the source of a difference calculator tool. Please render it as an artif
 3. Optionally add filters per file via **+ filter**
 4. Select segment column(s) for the join key
 5. Choose the metric column(s) to compare
-6. Optionally add **Metric Overrides** for segments that use a different metric column
+6. If multiple metrics: optionally enable **segment drilldown** via the toggle
 7. Click **⚡ Calculate**
 
 ### Pivot

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Δ Diff Calculator v1.7</title>
+<title>Δ Diff Calculator v1.8</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -278,30 +278,41 @@ tr.sub-row td.seg-indent{padding-left:28px;color:var(--muted);}
       </div>
     </div>
     <div id="cfg-wrap" style="display:none">
-      <div class="slabel">Segment columns <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--faint);">both files — multiple = join with _</span></div>
-      <div class="row"><div class="fg"><select id="seg-col" multiple></select></div></div>
-      <div class="slabel">Metric</div>
+      <div class="info-box" id="f-mode-info">
+        <strong>Single metric</strong> mode: pick segment columns (rows) and one metric to compare. <strong>Multi-metric</strong> mode: each selected metric becomes its own row — optionally add a segment drilldown.
+      </div>
+      <div class="slabel">Metrics <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--faint);">select multiple → each becomes its own row</span></div>
       <label class="toggle-row">
         <span class="tog"><input type="checkbox" id="same-metric-tog" onchange="onSameMetric()" checked><span class="tslider"></span></span>
-        Same metric column in both files
+        Same metric column(s) in both files
       </label>
-      <div id="same-metric-ui"><div class="row"><div class="fg"><label>Metric column (both)</label><select id="metric-both"></select></div></div></div>
+      <div id="same-metric-ui">
+        <div class="row"><div class="fg"><label>Metric column(s) — both files</label><select id="metric-both" multiple style="height:100px;" onchange="onFileMetricChange()"></select></div></div>
+      </div>
       <div id="diff-metric-ui" style="display:none">
         <div class="row">
-          <div class="fg"><label>Metric — File A</label><select id="metric-a"></select></div>
-          <div class="fg"><label>Metric — File B</label><select id="metric-b"></select></div>
+          <div class="fg"><label>Metric — File A</label><select id="metric-a" multiple style="height:100px;" onchange="onFileMetricChange()"></select></div>
+          <div class="fg"><label>Metric — File B</label><select id="metric-b" multiple style="height:100px;" onchange="onFileMetricChange()"></select></div>
         </div>
+        <div class="err" id="f-diff-count-err" style="display:none;margin-top:6px;"></div>
       </div>
+
+      <div id="f-seg-wrap">
+        <div class="slabel">Segment join key <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--faint);">both files — rows matched on this</span></div>
+        <div id="f-seg-use-row" style="display:none;margin-bottom:8px;">
+          <label class="toggle-row" style="margin-bottom:0">
+            <span class="tog"><input type="checkbox" id="f-seg-use" onchange="onFileSegUseChange()"><span class="tslider"></span></span>
+            Also break down by segment columns <span style="font-size:11px;color:var(--faint);margin-left:4px;">metric row + segment drilldown</span>
+          </label>
+        </div>
+        <div id="f-seg-picker" class="row"><div class="fg"><select id="seg-col" multiple></select></div></div>
+      </div>
+
       <div class="slabel">Display names</div>
       <div class="row">
         <div class="fg"><label>Label for A values</label><input type="text" id="disp-a" placeholder="File A"></div>
         <div class="fg"><label>Label for B values</label><input type="text" id="disp-b" placeholder="File B"></div>
       </div>
-      <div class="slabel" style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;">
-        <span>Metric overrides <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--faint);font-size:10px;">per-segment</span></span>
-        <button class="btn btn-ghost btn-add-sm" onclick="addOverride()">+ override</button>
-      </div>
-      <div id="overrides-list" style="margin-bottom:8px;"></div>
       <div class="err" id="f-err"></div>
       <div style="margin-top:16px;"><button class="btn btn-primary" onclick="calcFiles()">⚡ Calculate</button></div>
     </div>
@@ -396,9 +407,9 @@ const store={
   async set(k,v){if(this._ws()){const r=await window.storage.set(k,v);if(!r)throw new Error('storage null');}else{localStorage.setItem(k,v);}}
 };
 
-const fmt=n=>parseFloat(n.toPrecision(6)).toLocaleString();
-const fmtP=n=>isFinite(n)?n.toFixed(2)+'%':'∞';
-const sgnP=n=>(n>=0?'+':'')+fmtP(n);
+const fmt=n=>n==null||!isFinite(n)?'∞':parseFloat(n.toPrecision(6)).toLocaleString();
+const fmtP=n=>n!=null&&isFinite(n)?n.toFixed(2)+'%':'∞';
+const sgnP=n=>n==null?'∞':(n>=0?'+':'')+fmtP(n);
 
 function diff(a,b){
   const abs=Math.abs(a-b),avg=(Math.abs(a)+Math.abs(b))/2;
@@ -465,14 +476,32 @@ function dlv(id){document.getElementById(id).classList.remove('drag');}
 function ddrop(e,slot){e.preventDefault();dlv('drop-'+slot);const f=e.dataTransfer.files[0];if(f)loadFile(f,slot);}
 function ddropPv(e){e.preventDefault();dlv('drop-pv');const f=e.dataTransfer.files[0];if(f)loadFilePv(f);}
 
-/* csv parse */
+/* csv parse — proper RFC-4180 quoted-field parser */
+function splitCSVLine(line,sep){
+  const fields=[];let cur='',inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(inQ){if(c==='"'){if(line[i+1]==='"'){cur+='"';i++;}else{inQ=false;}}else{cur+=c;}}
+    else{if(c==='"'){inQ=true;}else if(c===sep){fields.push(cur.trim());cur='';}else{cur+=c;}}
+  }
+  fields.push(cur.trim());return fields;
+}
 function parseCSV(txt){
   txt=txt.replace(/^\uFEFF/,'');
-  const lines=txt.trim().split(/\r?\n/);
-  const sep=lines[0].includes('\t')?'\t':',';
-  const headers=lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,''));
-  const rows=lines.slice(1).map(l=>{
-    const vals=l.split(sep).map(v=>v.trim().replace(/^"|"$/g,''));
+  const raw=txt.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  const records=[];let cur='',inQ=false;
+  for(let i=0;i<raw.length;i++){
+    const c=raw[i];
+    if(c==='"'){inQ=!inQ;cur+=c;}
+    else if(c==='\n'&&!inQ){records.push(cur);cur='';}
+    else{cur+=c;}
+  }
+  if(cur)records.push(cur);
+  if(!records.length)return{headers:[],rows:[]};
+  const sep=records[0].includes('\t')?'\t':',';
+  const headers=splitCSVLine(records[0],sep);
+  const rows=records.slice(1).map(l=>{
+    const vals=splitCSVLine(l,sep);
     const o={};headers.forEach((h,i)=>o[h]=vals[i]??'');return o;
   }).filter(r=>Object.values(r).some(v=>v!==''));
   return{headers,rows};
@@ -515,78 +544,112 @@ function tryBuildCfg(){
   const mb=document.getElementById('metric-both'),ma=document.getElementById('metric-a'),mbx=document.getElementById('metric-b');
   mb.innerHTML='';ma.innerHTML='';mbx.innerHTML='';
   common.forEach(h=>mb.add(new Option(h,h)));ha.forEach(h=>ma.add(new Option(h,h)));hb.forEach(h=>mbx.add(new Option(h,h)));
-  if(common.length>1)mb.value=common[common.length-1];
+  // deselect all by default — user picks explicitly
+  mb.selectedIndex=-1;ma.selectedIndex=-1;mbx.selectedIndex=-1;
   document.getElementById('cfg-wrap').style.display='block';
+  onFileMetricChange();
 }
 function onSameMetric(){
   const s=document.getElementById('same-metric-tog').checked;
   document.getElementById('same-metric-ui').style.display=s?'block':'none';
   document.getElementById('diff-metric-ui').style.display=s?'none':'block';
+  onFileMetricChange();
 }
-let overrides=[];
-function colOptsA(){return fd.a?fd.a.headers:[];}
-function colOptsB(){return fd.b?fd.b.headers:[];}
-function mkSel(cols,val,cb){const s=document.createElement('select');s.style.cssText='flex:1;min-width:110px;padding:6px 9px;font-size:12px;';cols.forEach(c=>{const o=new Option(c,c);if(c===val)o.selected=true;s.add(o);});s.onchange=e=>cb(e.target.value);return s;}
-function getSegKeys(){
-  const sc=Array.from(document.getElementById('seg-col').selectedOptions).map(o=>o.value);
-  if(!sc.length||!fd.a||!fd.b)return[];
-  const mk=(r,c)=>c.map(x=>r[x]??'').join('_');const k=new Set();
-  [...fd.a.rows,...fd.b.rows].forEach(r=>{const x=mk(r,sc);if(x)k.add(x);});return[...k].sort();
+function fileSelectedMetrics(){
+  const same=document.getElementById('same-metric-tog').checked;
+  if(same){
+    const sel=Array.from(document.getElementById('metric-both').selectedOptions).map(o=>o.value);
+    return sel.map(m=>({metA:m,metB:m}));
+  } else {
+    const selA=Array.from(document.getElementById('metric-a').selectedOptions).map(o=>o.value);
+    const selB=Array.from(document.getElementById('metric-b').selectedOptions).map(o=>o.value);
+    const err=document.getElementById('f-diff-count-err');
+    if(selA.length&&selB.length&&selA.length!==selB.length){
+      err.textContent='⚠ Select the same number of columns in A and B ('+selA.length+' vs '+selB.length+')';err.style.display='block';
+    } else {err.style.display='none';}
+    return selA.map((m,i)=>({metA:m,metB:selB[i]||selB[0]||''}));
+  }
 }
-function globMatch(p,s){return new RegExp('^'+p.split('*').map(x=>x.replace(/[.+?^${}()|[\]\\]/g,'\\$&')).join('.*')+'$').test(s);}
-function matchedKeys(pat){return pat?getSegKeys().filter(k=>globMatch(pat,k)):[];}
-function renderOverrides(){
-  const list=document.getElementById('overrides-list');if(!list)return;list.innerHTML='';
-  overrides.forEach((ov,i)=>{
-    const row=document.createElement('div');row.className='filter-row';row.style.flexWrap='wrap';
-    const sw=document.createElement('div');sw.style.cssText='display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px;';
-    const sl=document.createElement('span');sl.textContent='Segment pattern (* wildcard)';sl.style.cssText='font-size:10.5px;color:var(--muted);';
-    const pi=document.createElement('input');pi.type='text';pi.placeholder='e.g. *.ru  mobile_*';pi.value=ov.pattern||'';pi.style.cssText='width:100%;padding:6px 9px;font-size:12.5px;';
-    const mh=document.createElement('span');mh.style.cssText='font-size:10.5px;color:var(--emerald);min-height:14px;font-family:var(--mono);';
-    const uh=()=>{const m=matchedKeys(pi.value.trim());mh.textContent=pi.value.trim()?(m.length?'✓ '+m.length+' match'+(m.length>1?'es':''):'⚠ no matches'):'';};
-    pi.oninput=e=>{overrides[i].pattern=e.target.value;uh();};uh();sw.append(sl,pi,mh);
-    const aw=document.createElement('div');aw.style.cssText='display:flex;flex-direction:column;gap:3px;min-width:110px;';
-    const al=document.createElement('span');al.textContent='Metric A';al.style.cssText='font-size:10.5px;color:var(--muted);';aw.append(al,mkSel(colOptsA(),ov.metA,v=>overrides[i].metA=v));
-    const bw=document.createElement('div');bw.style.cssText='display:flex;flex-direction:column;gap:3px;min-width:110px;';
-    const bl=document.createElement('span');bl.textContent='Metric B';bl.style.cssText='font-size:10.5px;color:var(--muted);';bw.append(bl,mkSel(colOptsB(),ov.metB,v=>overrides[i].metB=v));
-    const del=document.createElement('span');del.textContent='×';del.className='del-cell';del.style.lineHeight='3';del.onclick=()=>{overrides.splice(i,1);renderOverrides();};
-    row.append(sw,aw,bw,del);list.appendChild(row);
-  });
+function onFileMetricChange(){
+  const metrics=fileSelectedMetrics();
+  const multi=metrics.length>1;
+  // show/hide segment "also drilldown" toggle
+  document.getElementById('f-seg-use-row').style.display=multi?'block':'none';
+  const useSegInMulti=multi&&document.getElementById('f-seg-use').checked;
+  const segPicker=document.getElementById('f-seg-picker');
+  if(multi){
+    segPicker.style.display=useSegInMulti?'flex':'none';
+  } else {
+    segPicker.style.display='flex';
+  }
 }
-function addOverride(){
-  const s=document.getElementById('same-metric-tog').checked;
-  overrides.push({pattern:'',metA:s?document.getElementById('metric-both').value:document.getElementById('metric-a').value,metB:s?document.getElementById('metric-both').value:document.getElementById('metric-b').value});
-  renderOverrides();
-}
+function onFileSegUseChange(){onFileMetricChange();}
 function getFilteredRows(slot){let rows=fd[slot].rows;for(const f of filtersState[slot])if(f.col&&f.vals.size)rows=rows.filter(r=>f.vals.has(r[f.col]));return rows;}
 function showErr(msg){const e=document.getElementById('f-err');e.textContent='⚠ '+msg;e.style.display='block';}
 function hideErr(){document.getElementById('f-err').style.display='none';}
 
 function calcFiles(){
   hideErr();
-  const segCols=Array.from(document.getElementById('seg-col').selectedOptions).map(o=>o.value);
+  const metrics=fileSelectedMetrics();
+  if(!metrics.length){showErr('Select at least one metric column');return;}
   const same=document.getElementById('same-metric-tog').checked;
-  const mCA=same?document.getElementById('metric-both').value:document.getElementById('metric-a').value;
-  const mCB=same?document.getElementById('metric-both').value:document.getElementById('metric-b').value;
-  const dA=document.getElementById('disp-a').value.trim()||mCA+' (A)';
-  const dB=document.getElementById('disp-b').value.trim()||mCB+' (B)';
-  if(!segCols.length){showErr('Select at least one segment column');return;}
-  if(!mCA||!mCB){showErr('Select metric column(s)');return;}
+  if(!same){
+    const selA=Array.from(document.getElementById('metric-a').selectedOptions).map(o=>o.value);
+    const selB=Array.from(document.getElementById('metric-b').selectedOptions).map(o=>o.value);
+    if(selA.length!==selB.length){showErr('Select the same number of metric columns in A and B');return;}
+  }
+  const multiMetric=metrics.length>1;
+  const useSegInMulti=multiMetric&&document.getElementById('f-seg-use').checked;
+  const segCols=Array.from(document.getElementById('seg-col').selectedOptions).map(o=>o.value);
+  if(!multiMetric&&!segCols.length){showErr('Select at least one segment column (or pick multiple metrics)');return;}
+  if(useSegInMulti&&!segCols.length){showErr('Select segment columns for drilldown');return;}
+  const dA=document.getElementById('disp-a').value.trim()||'File A';
+  const dB=document.getElementById('disp-b').value.trim()||'File B';
   const mk=(r,c)=>c.map(x=>r[x]??'').join('_');
-  const ovMap={};const allK=[...new Set([...getFilteredRows('a'),...getFilteredRows('b')].map(r=>mk(r,segCols)).filter(k=>k))];
-  overrides.forEach(ov=>{if(!ov.pattern)return;allK.forEach(k=>{if(globMatch(ov.pattern,k))ovMap[k]={metA:ov.metA,metB:ov.metB};});});
-  const mapA={},mapB={};
-  getFilteredRows('a').forEach(r=>{const k=mk(r,segCols);if(!k)return;mapA[k]=parseFloat(r[ovMap[k]?ovMap[k].metA:mCA]);});
-  getFilteredRows('b').forEach(r=>{const k=mk(r,segCols);if(!k)return;mapB[k]=parseFloat(r[ovMap[k]?ovMap[k].metB:mCB]);});
-  const keys=[...new Set([...Object.keys(mapA),...Object.keys(mapB)])];
+  const rowsA=getFilteredRows('a'),rowsB=getFilteredRows('b');
   const ne=[],sk=[];
-  keys.forEach(k=>{
-    const a=mapA[k],b=mapB[k];if(isNaN(a)||isNaN(b)){sk.push(k);return;}
-    const d=diff(a,b);ne.push({label:k+(ovMap[k]?' *':''),a,b,...d,nameA:dA,nameB:dB,time:new Date().toISOString(),source:'file'});
+
+  metrics.forEach(({metA,metB})=>{
+    if(!metA||!metB){sk.push(metA||metB);return;}
+    const nameA=multiMetric?dA+'_'+metA:dA;
+    const nameB=multiMetric?dB+'_'+metB:dB;
+
+    if(multiMetric){
+      // each metric → one summary row, with optional seg drilldown
+      const totBk={a:[],b:[]};
+      const segBk={a:{},b:{}};
+      rowsA.forEach(r=>{const v=parseFloat(r[metA]);if(isNaN(v))return;totBk.a.push(v);if(useSegInMulti){const k=mk(r,segCols);if(k){if(!segBk.a[k])segBk.a[k]=[];segBk.a[k].push(v);}}});
+      rowsB.forEach(r=>{const v=parseFloat(r[metB]);if(isNaN(v))return;totBk.b.push(v);if(useSegInMulti){const k=mk(r,segCols);if(k){if(!segBk.b[k])segBk.b[k]=[];segBk.b[k].push(v);}}});
+      const totA=totBk.a.reduce((s,v)=>s+v,0),totB=totBk.b.reduce((s,v)=>s+v,0);
+      if(!totBk.a.length||!totBk.b.length){sk.push(metA);return;}
+      const d=diff(totA,totB);
+      let drilldown=null;
+      if(useSegInMulti){
+        drilldown=[];
+        const segKeys=[...new Set([...Object.keys(segBk.a),...Object.keys(segBk.b)])];
+        segKeys.forEach(k=>{
+          const sa=segBk.a[k]?.reduce((s,v)=>s+v,0),sb=segBk.b[k]?.reduce((s,v)=>s+v,0);
+          if(sa==null||sb==null)return;
+          drilldown.push({segKey:k,a:sa,b:sb,...diff(sa,sb)});
+        });
+      }
+      ne.push({label:metA+(metA!==metB?' / '+metB:''),a:totA,b:totB,...d,nameA,nameB,drilldown,time:new Date().toISOString(),source:'file'});
+    } else {
+      // single metric — segment columns as rows
+      const mapA={},mapB={};
+      rowsA.forEach(r=>{const k=mk(r,segCols);if(!k)return;const v=parseFloat(r[metA]);if(!isNaN(v))mapA[k]=v;});
+      rowsB.forEach(r=>{const k=mk(r,segCols);if(!k)return;const v=parseFloat(r[metB]);if(!isNaN(v))mapB[k]=v;});
+      const keys=[...new Set([...Object.keys(mapA),...Object.keys(mapB)])];
+      keys.forEach(k=>{
+        const a=mapA[k],b=mapB[k];if(a==null||b==null||isNaN(a)||isNaN(b)){sk.push(k);return;}
+        ne.push({label:k,a,b,...diff(a,b),nameA,nameB,drilldown:null,time:new Date().toISOString(),source:'file'});
+      });
+    }
   });
-  if(!ne.length){showErr('No matching rows found');return;}
+
+  if(!ne.length){showErr('No matching data found — check metric and segment selection');return;}
   entries=[...entries,...ne];renderHist();document.getElementById('hist').style.display='block';save();
-  toast('Added '+ne.length+' rows'+(sk.length?' ('+sk.length+' skipped)':''));
+  toast('Added '+ne.length+' rows across '+metrics.length+' metric'+(metrics.length>1?'s':'')+(sk.length?' ('+sk.length+' skipped)':''));
 }
 
 /* pivot */
@@ -772,8 +835,8 @@ function getGroups(){
     groupOrder.forEach(gk=>{
       groupMap[gk].rows.sort((x,y)=>{
         if(col==='label'){const lx=(x.label||'').toLowerCase(),ly=(y.label||'').toLowerCase();return dir==='asc'?lx.localeCompare(ly):ly.localeCompare(lx);}
-        const vx=isFinite(x[col])?x[col]:(dir==='desc'?-Infinity:Infinity);
-        const vy=isFinite(y[col])?y[col]:(dir==='desc'?-Infinity:Infinity);
+        const vx=(x[col]!=null&&isFinite(x[col]))?x[col]:(dir==='desc'?-Infinity:Infinity);
+        const vy=(y[col]!=null&&isFinite(y[col]))?y[col]:(dir==='desc'?-Infinity:Infinity);
         return dir==='desc'?vy-vx:vx-vy;
       });
     });
@@ -844,7 +907,7 @@ function renderHist(){
 
     const dataRows=g.rows.map(r=>{
       const oi=globalIdx.get(r);
-      const relBadge=isFinite(r.rel)?`<span class="badge ${r.rel<1?'badge-neu':'badge-neg'}">${fmtP(r.rel)}</span>`:`<span class="badge badge-neg">∞</span>`;
+      const relBadge=r.rel!=null&&isFinite(r.rel)?`<span class="badge ${r.rel<1?'badge-neu':'badge-neg'}">${fmtP(r.rel)}</span>`:`<span class="badge badge-neg">∞</span>`;
       const hasDrill=r.drilldown&&r.drilldown.length>0;
       const isOpen=expandedRows.has(oi);
       const expandBtn=hasDrill
@@ -863,7 +926,7 @@ function renderHist(){
       let subRows='';
       if(hasDrill&&isOpen){
         subRows=r.drilldown.map(s=>{
-          const srel=isFinite(s.rel)?`<span class="badge ${s.rel<1?'badge-neu':'badge-neg'}">${fmtP(s.rel)}</span>`:`<span class="badge badge-neg">∞</span>`;
+          const srel=s.rel!=null&&isFinite(s.rel)?`<span class="badge ${s.rel<1?'badge-neu':'badge-neg'}">${fmtP(s.rel)}</span>`:`<span class="badge badge-neg">∞</span>`;
           return`<tr class="sub-row">
             <td></td>
             <td class="seg-indent">${s.segKey||'—'}</td>
@@ -886,7 +949,7 @@ function renderHist(){
       const totA=allGroupEntries.reduce((s,e)=>s+e.a,0);
       const totB=allGroupEntries.reduce((s,e)=>s+e.b,0);
       const totD=diff(totA,totB);
-      const totRelBadge=isFinite(totD.rel)?`<span class="badge ${totD.rel<1?'badge-neu':'badge-neg'}">${fmtP(totD.rel)}</span>`:`<span class="badge badge-neg">∞</span>`;
+      const totRelBadge=totD.rel!=null&&isFinite(totD.rel)?`<span class="badge ${totD.rel<1?'badge-neu':'badge-neg'}">${fmtP(totD.rel)}</span>`:`<span class="badge badge-neg">∞</span>`;
       totalRow=`<tr class="group-total">
         <td></td>
         <td class="total-label">Total (${allGroupEntries.length})</td>
@@ -938,7 +1001,7 @@ function expCSV(){
     const cells=['"'+seg.replace(/"/g,'""')+'"'];
     groupOrder.forEach(gk=>{
       const v=wide[seg]?.[gk];
-      if(v){cells.push(v.a,v.b,v.abs.toFixed(6),isFinite(v.rel)?v.rel.toFixed(4):'Infinity');}
+      if(v){cells.push(v.a,v.b,v.abs.toFixed(6),v.rel!=null&&isFinite(v.rel)?v.rel.toFixed(4):'Infinity');}        
       else{cells.push('','','','');}
     });
     return cells.join(',');
@@ -950,7 +1013,7 @@ function expCSV(){
     const tA=gEntries.reduce((s,e)=>s+e.a,0);
     const tB=gEntries.reduce((s,e)=>s+e.b,0);
     const td=diff(tA,tB);
-    totalCells.push(tA,tB,td.abs.toFixed(6),isFinite(td.rel)?td.rel.toFixed(4):'Infinity');
+    totalCells.push(tA,tB,td.abs.toFixed(6),td.rel!=null&&isFinite(td.rel)?td.rel.toFixed(4):'Infinity');
   });
   dl('diff_results.csv',[hdrCols.join(','),...dataRows,totalCells.join(',')].join('\n'),'text/csv');
   toast('CSV exported ('+allSegs.length+' segments, '+groupOrder.length+' metric'+(groupOrder.length>1?'s':'')+')',false);
